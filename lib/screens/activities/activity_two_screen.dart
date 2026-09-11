@@ -8,9 +8,9 @@ class ActivityTwoScreen extends StatefulWidget {
 }
 
 class _ActivityTwoScreenState extends State<ActivityTwoScreen> {
-  final _quizController = TextEditingController(text: '85');
-  final _examController = TextEditingController(text: '90');
-  final _projectController = TextEditingController(text: '92');
+  final _quizController = TextEditingController(text: '88');
+  final _examController = TextEditingController(text: '92');
+  final _projectController = TextEditingController(text: '95');
 
   double _quizWeight = 0.3; // 30%
   double _examWeight = 0.5; // 50%
@@ -18,7 +18,7 @@ class _ActivityTwoScreenState extends State<ActivityTwoScreen> {
 
   double _finalGrade = 0.0;
   String _gradeLetter = 'A';
-  Color _statusColor = Colors.green;
+  Color _statusColor = const Color(0xFF10B981);
 
   @override
   void initState() {
@@ -37,16 +37,16 @@ class _ActivityTwoScreenState extends State<ActivityTwoScreen> {
 
       if (_finalGrade >= 90) {
         _gradeLetter = 'A (Excellent / High Honors)';
-        _statusColor = Colors.green;
+        _statusColor = const Color(0xFF10B981);
       } else if (_finalGrade >= 80) {
         _gradeLetter = 'B (Very Good / Honors)';
-        _statusColor = Colors.blue;
+        _statusColor = const Color(0xFF3B82F6);
       } else if (_finalGrade >= 75) {
         _gradeLetter = 'C (Satisfactory Pass)';
-        _statusColor = Colors.orange;
+        _statusColor = const Color(0xFFF59E0B);
       } else {
         _gradeLetter = 'F (Needs Improvement)';
-        _statusColor = Colors.red;
+        _statusColor = const Color(0xFFEF4444);
       }
     });
   }
@@ -76,25 +76,28 @@ class _ActivityTwoScreenState extends State<ActivityTwoScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Header badge
+                // Header chip
                 Container(
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
                   decoration: BoxDecoration(
-                    color: Colors.teal.withValues(alpha: 0.1),
+                    color: Colors.teal.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: Colors.teal.withValues(alpha: 0.3)),
+                    border:
+                        Border.all(color: Colors.teal.withValues(alpha: 0.3)),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(Icons.calculate, color: Colors.teal, size: 16),
-                      const SizedBox(width: 6),
+                      const Icon(Icons.calculate_rounded,
+                          color: Colors.teal, size: 16),
+                      const SizedBox(width: 8),
                       Text(
-                        'Interactive Inputs & Math Computations',
+                        'INTERACTIVE INPUTS & MATHEMATICAL FORMULAS',
                         style: theme.textTheme.labelMedium?.copyWith(
                           color: Colors.teal,
                           fontWeight: FontWeight.bold,
+                          letterSpacing: 0.5,
                         ),
                       ),
                     ],
@@ -102,14 +105,63 @@ class _ActivityTwoScreenState extends State<ActivityTwoScreen> {
                 ),
                 const SizedBox(height: 16),
 
-                // Form card
+                // Card 1: Dynamic Calculation Display Banner
                 Card(
-                  elevation: 2,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
+                  elevation: 3,
+                  color: _statusColor.withValues(alpha: 0.08),
                   child: Padding(
-                    padding: const EdgeInsets.all(20.0),
+                    padding: const EdgeInsets.all(28.0),
+                    child: Column(
+                      children: [
+                        Text(
+                          'Estimated Final Score',
+                          style: theme.textTheme.titleSmall?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: _statusColor,
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          _finalGrade.toStringAsFixed(1),
+                          style: theme.textTheme.displayLarge?.copyWith(
+                            fontWeight: FontWeight.w900,
+                            color: _statusColor,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 18, vertical: 8),
+                          decoration: BoxDecoration(
+                            color: _statusColor,
+                            borderRadius: BorderRadius.circular(20),
+                            boxShadow: [
+                              BoxShadow(
+                                color: _statusColor.withValues(alpha: 0.3),
+                                blurRadius: 10,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          child: Text(
+                            _gradeLetter,
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 24),
+
+                // Card 2: Score Inputs Form
+                Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(24.0),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -122,17 +174,24 @@ class _ActivityTwoScreenState extends State<ActivityTwoScreen> {
                         const SizedBox(height: 16),
                         LayoutBuilder(
                           builder: (context, constraints) {
-                            final isWide = constraints.maxWidth > 500;
+                            final isWide = constraints.maxWidth > 550;
                             final inputs = [
                               Expanded(
                                 flex: isWide ? 1 : 0,
                                 child: TextField(
                                   controller: _quizController,
                                   keyboardType: TextInputType.number,
-                                  decoration: const InputDecoration(
+                                  decoration: InputDecoration(
                                     labelText: 'Quiz Score (0-100)',
-                                    border: OutlineInputBorder(),
-                                    prefixIcon: Icon(Icons.quiz),
+                                    filled: true,
+                                    fillColor: colorScheme
+                                        .surfaceContainerHighest
+                                        .withValues(alpha: 0.4),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(14),
+                                      borderSide: BorderSide.none,
+                                    ),
+                                    prefixIcon: const Icon(Icons.quiz_rounded),
                                   ),
                                   onChanged: (_) => _calculateGrade(),
                                 ),
@@ -145,10 +204,18 @@ class _ActivityTwoScreenState extends State<ActivityTwoScreen> {
                                 child: TextField(
                                   controller: _examController,
                                   keyboardType: TextInputType.number,
-                                  decoration: const InputDecoration(
+                                  decoration: InputDecoration(
                                     labelText: 'Exam Score (0-100)',
-                                    border: OutlineInputBorder(),
-                                    prefixIcon: Icon(Icons.assignment),
+                                    filled: true,
+                                    fillColor: colorScheme
+                                        .surfaceContainerHighest
+                                        .withValues(alpha: 0.4),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(14),
+                                      borderSide: BorderSide.none,
+                                    ),
+                                    prefixIcon:
+                                        const Icon(Icons.assignment_rounded),
                                   ),
                                   onChanged: (_) => _calculateGrade(),
                                 ),
@@ -161,10 +228,18 @@ class _ActivityTwoScreenState extends State<ActivityTwoScreen> {
                                 child: TextField(
                                   controller: _projectController,
                                   keyboardType: TextInputType.number,
-                                  decoration: const InputDecoration(
+                                  decoration: InputDecoration(
                                     labelText: 'Project Score (0-100)',
-                                    border: OutlineInputBorder(),
-                                    prefixIcon: Icon(Icons.laptop_mac),
+                                    filled: true,
+                                    fillColor: colorScheme
+                                        .surfaceContainerHighest
+                                        .withValues(alpha: 0.4),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(14),
+                                      borderSide: BorderSide.none,
+                                    ),
+                                    prefixIcon:
+                                        const Icon(Icons.laptop_mac_rounded),
                                   ),
                                   onChanged: (_) => _calculateGrade(),
                                 ),
@@ -189,11 +264,12 @@ class _ActivityTwoScreenState extends State<ActivityTwoScreen> {
                           ),
                         ),
                         Text(
-                          'Adjust Quiz weight (Exam & Project adjust proportionately):',
+                          'Adjust Quiz weight (Exam and Project rebalance automatically):',
                           style: theme.textTheme.bodySmall?.copyWith(
                             color: colorScheme.onSurfaceVariant,
                           ),
                         ),
+                        const SizedBox(height: 8),
                         Slider(
                           value: _quizWeight,
                           min: 0.1,
@@ -212,68 +288,22 @@ class _ActivityTwoScreenState extends State<ActivityTwoScreen> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text(
-                              'Quiz: ${(_quizWeight * 100).round()}%',
-                              style: theme.textTheme.bodySmall,
+                            Chip(
+                              avatar: const Icon(Icons.pie_chart, size: 14),
+                              label: Text(
+                                  'Quiz: ${(_quizWeight * 100).round()}%'),
                             ),
-                            Text(
-                              'Exam: ${(_examWeight * 100).round()}%',
-                              style: theme.textTheme.bodySmall,
+                            Chip(
+                              avatar: const Icon(Icons.pie_chart, size: 14),
+                              label: Text(
+                                  'Exam: ${(_examWeight * 100).round()}%'),
                             ),
-                            Text(
-                              'Project: ${(_projectWeight * 100).round()}%',
-                              style: theme.textTheme.bodySmall,
+                            Chip(
+                              avatar: const Icon(Icons.pie_chart, size: 14),
+                              label: Text(
+                                  'Project: ${(_projectWeight * 100).round()}%'),
                             ),
                           ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 24),
-
-                // Calculation Result Card
-                Card(
-                  elevation: 4,
-                  color: _statusColor.withValues(alpha: 0.1),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    side: BorderSide(color: _statusColor.withValues(alpha: 0.5)),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(24.0),
-                    child: Column(
-                      children: [
-                        Text(
-                          'Estimated Final Score',
-                          style: theme.textTheme.titleSmall?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: _statusColor,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          _finalGrade.toStringAsFixed(1),
-                          style: theme.textTheme.displayLarge?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: _statusColor,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 6),
-                          decoration: BoxDecoration(
-                            color: _statusColor,
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Text(
-                            _gradeLetter,
-                            style: theme.textTheme.titleMedium?.copyWith(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
                         ),
                       ],
                     ),

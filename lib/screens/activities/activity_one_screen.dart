@@ -23,11 +23,11 @@ class _ActivityOneScreenState extends State<ActivityOneScreen> {
   int _counter = 0;
   final TextEditingController _taskController = TextEditingController();
   final List<TaskItem> _tasks = [
-    TaskItem(id: '1', title: 'Setup Flutter Project', isCompleted: true),
-    TaskItem(id: '2', title: 'Configure Provider State Management', isCompleted: true),
-    TaskItem(id: '3', title: 'Test Responsive Layout on Desktop/Mobile', isCompleted: false),
+    TaskItem(id: '1', title: 'Setup Flutter Project & Provider', isCompleted: true),
+    TaskItem(id: '2', title: 'Implement Responsive Navigation Routes', isCompleted: true),
+    TaskItem(id: '3', title: 'Test Dark/Light Theme Switching', isCompleted: false),
   ];
-  String _filter = 'All'; // All, Active, Completed
+  String _filter = 'All';
 
   void _incrementCounter() {
     setState(() {
@@ -84,6 +84,12 @@ class _ActivityOneScreenState extends State<ActivityOneScreen> {
     return _tasks;
   }
 
+  double get _completionRatio {
+    if (_tasks.isEmpty) return 0.0;
+    final completedCount = _tasks.where((t) => t.isCompleted).length;
+    return completedCount / _tasks.length;
+  }
+
   @override
   void dispose() {
     _taskController.dispose();
@@ -94,6 +100,7 @@ class _ActivityOneScreenState extends State<ActivityOneScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final completedCount = _tasks.where((t) => t.isCompleted).length;
 
     return Scaffold(
       appBar: AppBar(
@@ -107,25 +114,28 @@ class _ActivityOneScreenState extends State<ActivityOneScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Header badge
+                // Header Chip
                 Container(
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
                   decoration: BoxDecoration(
-                    color: Colors.blue.withValues(alpha: 0.1),
+                    color: Colors.blue.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: Colors.blue.withValues(alpha: 0.3)),
+                    border:
+                        Border.all(color: Colors.blue.withValues(alpha: 0.3)),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(Icons.widgets, color: Colors.blue, size: 16),
-                      const SizedBox(width: 6),
+                      const Icon(Icons.tune_rounded,
+                          color: Colors.blue, size: 16),
+                      const SizedBox(width: 8),
                       Text(
-                        'Local State Management (StatefulWidget)',
+                        'LOCAL STATE MANAGEMENT (StatefulWidget)',
                         style: theme.textTheme.labelMedium?.copyWith(
                           color: Colors.blue,
                           fontWeight: FontWeight.bold,
+                          letterSpacing: 0.5,
                         ),
                       ),
                     ],
@@ -133,47 +143,63 @@ class _ActivityOneScreenState extends State<ActivityOneScreen> {
                 ),
                 const SizedBox(height: 16),
 
-                // Section 1: Local Counter Widget
+                // Card 1: Counter Component
                 Card(
-                  elevation: 2,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
                   child: Padding(
-                    padding: const EdgeInsets.all(20.0),
+                    padding: const EdgeInsets.all(24.0),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Interactive Counter Tracker',
+                          'Interactive Counter Widget',
                           style: theme.textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        const SizedBox(height: 12),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              'Current Count:',
-                              style: theme.textTheme.bodyLarge,
+                        const SizedBox(height: 16),
+                        Container(
+                          padding: const EdgeInsets.all(20),
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [
+                                colorScheme.primaryContainer,
+                                colorScheme.primaryContainer
+                                    .withValues(alpha: 0.6),
+                              ],
                             ),
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 20, vertical: 8),
-                              decoration: BoxDecoration(
-                                color: colorScheme.primaryContainer,
-                                borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Stateful Counter',
+                                    style: theme.textTheme.labelMedium?.copyWith(
+                                      color: colorScheme.onPrimaryContainer
+                                          .withValues(alpha: 0.8),
+                                    ),
+                                  ),
+                                  Text(
+                                    'Local setState()',
+                                    style: theme.textTheme.bodySmall?.copyWith(
+                                      color: colorScheme.onPrimaryContainer
+                                          .withValues(alpha: 0.6),
+                                    ),
+                                  ),
+                                ],
                               ),
-                              child: Text(
+                              Text(
                                 '$_counter',
-                                style: theme.textTheme.headlineMedium?.copyWith(
+                                style: theme.textTheme.displaySmall?.copyWith(
                                   fontWeight: FontWeight.bold,
                                   color: colorScheme.onPrimaryContainer,
                                 ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                         const SizedBox(height: 16),
                         Row(
@@ -181,24 +207,36 @@ class _ActivityOneScreenState extends State<ActivityOneScreen> {
                             Expanded(
                               child: OutlinedButton.icon(
                                 onPressed: _decrementCounter,
-                                icon: const Icon(Icons.remove),
+                                icon: const Icon(Icons.remove_rounded),
                                 label: const Text('Decrement'),
+                                style: OutlinedButton.styleFrom(
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 14),
+                                ),
                               ),
                             ),
                             const SizedBox(width: 8),
                             Expanded(
                               child: OutlinedButton.icon(
                                 onPressed: _resetCounter,
-                                icon: const Icon(Icons.refresh),
+                                icon: const Icon(Icons.refresh_rounded),
                                 label: const Text('Reset'),
+                                style: OutlinedButton.styleFrom(
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 14),
+                                ),
                               ),
                             ),
                             const SizedBox(width: 8),
                             Expanded(
                               child: ElevatedButton.icon(
                                 onPressed: _incrementCounter,
-                                icon: const Icon(Icons.add),
+                                icon: const Icon(Icons.add_rounded),
                                 label: const Text('Increment'),
+                                style: ElevatedButton.styleFrom(
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 14),
+                                ),
                               ),
                             ),
                           ],
@@ -209,36 +247,59 @@ class _ActivityOneScreenState extends State<ActivityOneScreen> {
                 ),
                 const SizedBox(height: 24),
 
-                // Section 2: Task List Local Manager
+                // Card 2: Dynamic Task Manager with Progress Indicator
                 Card(
-                  elevation: 2,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
                   child: Padding(
-                    padding: const EdgeInsets.all(20.0),
+                    padding: const EdgeInsets.all(24.0),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          'Dynamic Task Manager',
-                          style: theme.textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Dynamic Task Manager',
+                              style: theme.textTheme.titleMedium?.copyWith(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Text(
+                              '$completedCount / ${_tasks.length} Done',
+                              style: theme.textTheme.labelMedium?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: colorScheme.primary,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 10),
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: LinearProgressIndicator(
+                            value: _completionRatio,
+                            minHeight: 8,
+                            backgroundColor: colorScheme.surfaceContainerHighest,
                           ),
                         ),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: 20),
 
-                        // Add task input row
+                        // Input field row
                         Row(
                           children: [
                             Expanded(
                               child: TextField(
                                 controller: _taskController,
-                                decoration: const InputDecoration(
+                                decoration: InputDecoration(
                                   hintText: 'Enter new activity task...',
-                                  border: OutlineInputBorder(),
-                                  contentPadding: EdgeInsets.symmetric(
-                                      horizontal: 14, vertical: 12),
+                                  filled: true,
+                                  fillColor: colorScheme.surfaceContainerHighest
+                                      .withValues(alpha: 0.4),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                    borderSide: BorderSide.none,
+                                  ),
+                                  contentPadding: const EdgeInsets.symmetric(
+                                      horizontal: 16, vertical: 14),
                                 ),
                                 onSubmitted: (_) => _addTask(),
                               ),
@@ -246,18 +307,21 @@ class _ActivityOneScreenState extends State<ActivityOneScreen> {
                             const SizedBox(width: 12),
                             ElevatedButton.icon(
                               onPressed: _addTask,
-                              icon: const Icon(Icons.add_task),
+                              icon: const Icon(Icons.add_task_rounded),
                               label: const Text('Add Task'),
                               style: ElevatedButton.styleFrom(
                                 padding: const EdgeInsets.symmetric(
-                                    horizontal: 16, vertical: 16),
+                                    horizontal: 18, vertical: 16),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
                               ),
                             ),
                           ],
                         ),
                         const SizedBox(height: 16),
 
-                        // Filter chips row
+                        // Filter choices
                         Row(
                           children: ['All', 'Active', 'Completed'].map((filter) {
                             final isSelected = _filter == filter;
@@ -277,14 +341,25 @@ class _ActivityOneScreenState extends State<ActivityOneScreen> {
                             );
                           }).toList(),
                         ),
-                        const Divider(height: 24),
+                        const Divider(height: 28),
 
-                        // Tasks list view
+                        // Task items list
                         _filteredTasks.isEmpty
-                            ? const Padding(
-                                padding: EdgeInsets.all(20.0),
+                            ? Padding(
+                                padding: const EdgeInsets.all(24.0),
                                 child: Center(
-                                  child: Text('No tasks found in this filter.'),
+                                  child: Column(
+                                    children: [
+                                      Icon(Icons.checklist_rounded,
+                                          size: 40,
+                                          color: colorScheme.outline),
+                                      const SizedBox(height: 8),
+                                      Text(
+                                        'No tasks found in "$_filter"',
+                                        style: theme.textTheme.bodyMedium,
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               )
                             : ListView.builder(
@@ -293,25 +368,52 @@ class _ActivityOneScreenState extends State<ActivityOneScreen> {
                                 itemCount: _filteredTasks.length,
                                 itemBuilder: (context, index) {
                                   final task = _filteredTasks[index];
-                                  return CheckboxListTile(
-                                    key: ValueKey(task.id),
-                                    title: Text(
-                                      task.title,
-                                      style: TextStyle(
-                                        decoration: task.isCompleted
-                                            ? TextDecoration.lineThrough
-                                            : null,
-                                        color: task.isCompleted
-                                            ? colorScheme.outline
-                                            : colorScheme.onSurface,
+                                  return Padding(
+                                    padding:
+                                        const EdgeInsets.only(bottom: 8.0),
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        color: colorScheme
+                                            .surfaceContainerHighest
+                                            .withValues(alpha: 0.3),
+                                        borderRadius:
+                                            BorderRadius.circular(12),
+                                        border: Border.all(
+                                          color: colorScheme.outlineVariant
+                                              .withValues(alpha: 0.4),
+                                        ),
                                       ),
-                                    ),
-                                    value: task.isCompleted,
-                                    onChanged: (_) => _toggleTask(task.id),
-                                    secondary: IconButton(
-                                      icon: const Icon(Icons.delete_outline,
-                                          color: Colors.redAccent),
-                                      onPressed: () => _deleteTask(task.id),
+                                      child: CheckboxListTile(
+                                        key: ValueKey(task.id),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                        ),
+                                        title: Text(
+                                          task.title,
+                                          style: TextStyle(
+                                            decoration: task.isCompleted
+                                                ? TextDecoration.lineThrough
+                                                : null,
+                                            color: task.isCompleted
+                                                ? colorScheme.outline
+                                                : colorScheme.onSurface,
+                                            fontWeight: task.isCompleted
+                                                ? FontWeight.normal
+                                                : FontWeight.w600,
+                                          ),
+                                        ),
+                                        value: task.isCompleted,
+                                        onChanged: (_) => _toggleTask(task.id),
+                                        secondary: IconButton(
+                                          icon: const Icon(
+                                            Icons.delete_outline_rounded,
+                                            color: Colors.redAccent,
+                                          ),
+                                          onPressed: () =>
+                                              _deleteTask(task.id),
+                                        ),
+                                      ),
                                     ),
                                   );
                                 },

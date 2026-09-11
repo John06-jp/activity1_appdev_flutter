@@ -5,8 +5,30 @@ import '../providers/app_provider.dart';
 import '../widgets/activity_card.dart';
 import '../widgets/header_banner.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  String _searchQuery = '';
+  String _selectedCategory = 'All';
+
+  List<ActivityItem> get _filteredActivities {
+    return ActivityData.activities.where((activity) {
+      final matchesQuery = activity.title
+              .toLowerCase()
+              .contains(_searchQuery.toLowerCase()) ||
+          activity.description
+              .toLowerCase()
+              .contains(_searchQuery.toLowerCase());
+      final matchesCategory = _selectedCategory == 'All' ||
+          activity.category == _selectedCategory;
+      return matchesQuery && matchesCategory;
+    }).toList();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +38,22 @@ class HomeScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Flutter Laboratory Portfolio'),
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                color: colorScheme.primaryContainer,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(Icons.apps_rounded,
+                  color: colorScheme.onPrimaryContainer, size: 20),
+            ),
+            const SizedBox(width: 10),
+            const Text('Portfolio Dashboard'),
+          ],
+        ),
         actions: [
           IconButton(
             icon: Icon(
@@ -24,7 +61,7 @@ class HomeScreen extends StatelessWidget {
                   ? Icons.dark_mode_rounded
                   : Icons.light_mode_rounded,
             ),
-            tooltip: 'Toggle Theme State',
+            tooltip: appProvider.isDarkMode ? 'Light Mode' : 'Dark Mode',
             onPressed: () {
               appProvider.toggleTheme(!appProvider.isDarkMode);
             },
@@ -47,11 +84,83 @@ class HomeScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Header section displaying reactive User Profile state
+                  // Hero Header Banner
                   const HeaderBanner(),
                   const SizedBox(height: 28),
 
-                  // Section Title
+                  // Search and Filters Section
+                  Card(
+                    elevation: 1,
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        children: [
+                          TextField(
+                            onChanged: (val) {
+                              setState(() {
+                                _searchQuery = val;
+                              });
+                            },
+                            decoration: InputDecoration(
+                              hintText: 'Search laboratory activities...',
+                              prefixIcon: const Icon(Icons.search_rounded),
+                              suffixIcon: _searchQuery.isNotEmpty
+                                  ? IconButton(
+                                      icon: const Icon(Icons.clear_rounded),
+                                      onPressed: () {
+                                        setState(() {
+                                          _searchQuery = '';
+                                        });
+                                      },
+                                    )
+                                  : null,
+                              filled: true,
+                              fillColor: colorScheme.surfaceContainerHighest
+                                  .withValues(alpha: 0.5),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(14),
+                                borderSide: BorderSide.none,
+                              ),
+                              contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 16, vertical: 12),
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: Row(
+                              children: [
+                                'All',
+                                'Local State & UI',
+                                'Forms & Logic'
+                              ].map((category) {
+                                final isSelected =
+                                    _selectedCategory == category;
+                                return Padding(
+                                  padding: const EdgeInsets.only(right: 8.0),
+                                  child: FilterChip(
+                                    label: Text(category),
+                                    selected: isSelected,
+                                    onSelected: (selected) {
+                                      setState(() {
+                                        _selectedCategory = category;
+                                      });
+                                    },
+                                    selectedColor: colorScheme.primaryContainer,
+                                    checkmarkColor:
+                                        colorScheme.onPrimaryContainer,
+                                  ),
+                                );
+                              }).toList(),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+
+                  // Section Title Row
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -60,14 +169,14 @@ class HomeScreen extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Laboratory Activities Compilation',
+                              'Laboratory Compilation',
                               style: theme.textTheme.titleLarge?.copyWith(
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              'Select an activity below to launch its interactive demo.',
+                              'Tap any card to launch its interactive Flutter screen.',
                               style: theme.textTheme.bodyMedium?.copyWith(
                                 color: colorScheme.onSurfaceVariant,
                               ),
@@ -76,115 +185,131 @@ class HomeScreen extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(width: 12),
-                      Chip(
-                        avatar: Icon(Icons.check_circle,
-                            size: 16, color: colorScheme.primary),
-                        label: Text(
-                          '${ActivityData.activities.length} Labs Available',
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: colorScheme.primary.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Text(
+                          '${_filteredActivities.length} Loaded',
                           style: theme.textTheme.labelMedium?.copyWith(
+                            color: colorScheme.primary,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 16),
 
-                  // Responsive Layout: Grid for Wide screens, Column for Mobile
-                  LayoutBuilder(
-                    builder: (context, constraints) {
-                      final isWide = constraints.maxWidth > 650;
-
-                      if (isWide) {
-                        return GridView.builder(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          gridDelegate:
-                              const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
-                            crossAxisSpacing: 20,
-                            mainAxisSpacing: 20,
-                            childAspectRatio: 1.35,
+                  // Responsive Activities View
+                  _filteredActivities.isEmpty
+                      ? Card(
+                          child: Padding(
+                            padding: const EdgeInsets.all(40.0),
+                            child: Center(
+                              child: Column(
+                                children: [
+                                  Icon(Icons.search_off_rounded,
+                                      size: 48, color: colorScheme.outline),
+                                  const SizedBox(height: 12),
+                                  Text(
+                                    'No activities found matching "$_searchQuery"',
+                                    style: theme.textTheme.titleMedium,
+                                  ),
+                                  const SizedBox(height: 6),
+                                  Text(
+                                    'Try searching with a different term or clear filters.',
+                                    style: theme.textTheme.bodyMedium?.copyWith(
+                                      color: colorScheme.onSurfaceVariant,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
                           ),
-                          itemCount: ActivityData.activities.length,
-                          itemBuilder: (context, index) {
-                            final activity = ActivityData.activities[index];
-                            return ActivityCard(
-                              activity: activity,
-                              onTap: () {
-                                Navigator.pushNamed(
-                                    context, activity.routeName);
-                              },
+                        )
+                      : LayoutBuilder(
+                          builder: (context, constraints) {
+                            final isWide = constraints.maxWidth > 650;
+
+                            if (isWide) {
+                              return GridView.builder(
+                                shrinkWrap: true,
+                                physics: const NeverScrollableScrollPhysics(),
+                                gridDelegate:
+                                    const SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 2,
+                                  crossAxisSpacing: 20,
+                                  mainAxisSpacing: 20,
+                                  childAspectRatio: 1.3,
+                                ),
+                                itemCount: _filteredActivities.length,
+                                itemBuilder: (context, index) {
+                                  final activity = _filteredActivities[index];
+                                  return ActivityCard(
+                                    activity: activity,
+                                    onTap: () {
+                                      Navigator.pushNamed(
+                                          context, activity.routeName);
+                                    },
+                                  );
+                                },
+                              );
+                            }
+
+                            return Column(
+                              children: _filteredActivities.map((activity) {
+                                return Padding(
+                                  padding: const EdgeInsets.only(bottom: 16.0),
+                                  child: SizedBox(
+                                    height: 250,
+                                    child: ActivityCard(
+                                      activity: activity,
+                                      onTap: () {
+                                        Navigator.pushNamed(
+                                            context, activity.routeName);
+                                      },
+                                    ),
+                                  ),
+                                );
+                              }).toList(),
                             );
                           },
-                        );
-                      }
-
-                      // Mobile Column layout
-                      return Column(
-                        children: ActivityData.activities.map((activity) {
-                          return Padding(
-                            padding: const EdgeInsets.only(bottom: 16.0),
-                            child: ActivityCard(
-                              activity: activity,
-                              onTap: () {
-                                Navigator.pushNamed(
-                                    context, activity.routeName);
-                              },
-                            ),
-                          );
-                        }).toList(),
-                      );
-                    },
-                  ),
+                        ),
                   const SizedBox(height: 28),
 
-                  // Architecture Specs Summary Box
+                  // System Specs Box
                   Card(
                     elevation: 0,
-                    color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                      side: BorderSide(
-                        color: colorScheme.outlineVariant.withValues(alpha: 0.3),
-                      ),
-                    ),
+                    color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
                     child: Padding(
                       padding: const EdgeInsets.all(20.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                      child: Row(
                         children: [
-                          Row(
-                            children: [
-                              Icon(Icons.architecture_rounded,
-                                  color: colorScheme.primary),
-                              const SizedBox(width: 8),
-                              Text(
-                                'Architecture & State Features',
-                                style: theme.textTheme.titleMedium?.copyWith(
-                                  fontWeight: FontWeight.bold,
+                          Icon(Icons.verified_user_rounded,
+                              color: colorScheme.primary, size: 28),
+                          const SizedBox(width: 14),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Global App State Active',
+                                  style: theme.textTheme.titleSmall?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 12),
-                          Wrap(
-                            spacing: 8,
-                            runSpacing: 8,
-                            children: [
-                              _FeatureBadge(
-                                  label: 'Global State: Provider',
-                                  icon: Icons.sync),
-                              _FeatureBadge(
-                                  label: 'Declarative Widgets',
-                                  icon: Icons.layers),
-                              _FeatureBadge(
-                                  label: 'Responsive Layouts',
-                                  icon: Icons.devices),
-                              _FeatureBadge(
-                                  label: 'Material 3 Themes',
-                                  icon: Icons.palette),
-                            ],
+                                Text(
+                                  'State updates via Provider stream instantly across all routes in real-time.',
+                                  style: theme.textTheme.bodySmall?.copyWith(
+                                    color: colorScheme.onSurfaceVariant,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ],
                       ),
@@ -202,32 +327,8 @@ class HomeScreen extends StatelessWidget {
         },
         icon: const Icon(Icons.tune_rounded),
         label: const Text('State Settings'),
+        elevation: 4,
       ),
-    );
-  }
-}
-
-class _FeatureBadge extends StatelessWidget {
-  final String label;
-  final IconData icon;
-
-  const _FeatureBadge({required this.label, required this.icon});
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-
-    return Chip(
-      avatar: Icon(icon, size: 16, color: colorScheme.primary),
-      label: Text(
-        label,
-        style: theme.textTheme.bodySmall?.copyWith(
-          fontWeight: FontWeight.w600,
-        ),
-      ),
-      backgroundColor: colorScheme.surface,
-      side: BorderSide(color: colorScheme.outline.withValues(alpha: 0.2)),
     );
   }
 }

@@ -39,10 +39,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
         );
 
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Global User Profile updated successfully!'),
+      SnackBar(
+        content: const Row(
+          children: [
+            Icon(Icons.check_circle_rounded, color: Colors.white),
+            SizedBox(width: 10),
+            Text('Global User Profile updated & synced!'),
+          ],
+        ),
+        backgroundColor: Theme.of(context).colorScheme.primary,
         behavior: SnackBarBehavior.floating,
-        duration: Duration(seconds: 2),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        duration: const Duration(seconds: 2),
       ),
     );
   }
@@ -55,39 +63,34 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Global Settings & State'),
-        elevation: 0,
+        title: const Text('Global State Settings'),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24.0),
         child: Center(
           child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 700),
+            constraints: const BoxConstraints(maxWidth: 750),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Header section
                 Text(
-                  'Global App State',
+                  'Global App State Controls',
                   style: theme.textTheme.headlineSmall?.copyWith(
                     fontWeight: FontWeight.bold,
                     color: colorScheme.primary,
                   ),
                 ),
+                const SizedBox(height: 4),
                 Text(
-                  'Changes made here update the Provider store and immediately sync across the Home Dashboard and all laboratory activity screens.',
+                  'Modify global state variables managed by Provider. Updates reflect instantly across all screens.',
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: colorScheme.onSurfaceVariant,
                   ),
                 ),
                 const SizedBox(height: 24),
 
-                // Card 1: Theme State Toggle
+                // Card 1: Theme Mode Switcher
                 Card(
-                  elevation: 2,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
                   child: Padding(
                     padding: const EdgeInsets.all(20.0),
                     child: Column(
@@ -95,15 +98,22 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       children: [
                         Row(
                           children: [
-                            Icon(
-                              appProvider.isDarkMode
-                                  ? Icons.dark_mode_rounded
-                                  : Icons.light_mode_rounded,
-                              color: colorScheme.primary,
+                            Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: colorScheme.primary.withValues(alpha: 0.12),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Icon(
+                                appProvider.isDarkMode
+                                    ? Icons.dark_mode_rounded
+                                    : Icons.light_mode_rounded,
+                                color: colorScheme.primary,
+                              ),
                             ),
                             const SizedBox(width: 12),
                             Text(
-                              'App Theme Mode',
+                              'Theme Appearance Mode',
                               style: theme.textTheme.titleMedium?.copyWith(
                                 fontWeight: FontWeight.bold,
                               ),
@@ -111,18 +121,41 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           ],
                         ),
                         const Divider(height: 24),
-                        SwitchListTile(
-                          contentPadding: EdgeInsets.zero,
-                          title: const Text('Enable Dark Mode'),
-                          subtitle: Text(
-                            appProvider.isDarkMode
-                                ? 'Current: Dark Theme enabled'
-                                : 'Current: Light Theme enabled',
-                          ),
-                          value: appProvider.isDarkMode,
-                          onChanged: (bool value) {
-                            appProvider.toggleTheme(value);
-                          },
+                        Row(
+                          children: [
+                            Expanded(
+                              child: _ThemeChoiceCard(
+                                title: 'Light',
+                                icon: Icons.light_mode_rounded,
+                                isSelected:
+                                    appProvider.themeMode == ThemeMode.light,
+                                onTap: () =>
+                                    appProvider.setThemeMode(ThemeMode.light),
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: _ThemeChoiceCard(
+                                title: 'Dark',
+                                icon: Icons.dark_mode_rounded,
+                                isSelected:
+                                    appProvider.themeMode == ThemeMode.dark,
+                                onTap: () =>
+                                    appProvider.setThemeMode(ThemeMode.dark),
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: _ThemeChoiceCard(
+                                title: 'System',
+                                icon: Icons.brightness_auto_rounded,
+                                isSelected:
+                                    appProvider.themeMode == ThemeMode.system,
+                                onTap: () =>
+                                    appProvider.setThemeMode(ThemeMode.system),
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
@@ -130,12 +163,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
                 const SizedBox(height: 24),
 
-                // Card 2: User Profile Global State Form
+                // Card 2: Accent Color Selector
                 Card(
-                  elevation: 2,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
                   child: Padding(
                     padding: const EdgeInsets.all(20.0),
                     child: Column(
@@ -143,9 +172,104 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       children: [
                         Row(
                           children: [
-                            Icon(
-                              Icons.person_pin_rounded,
-                              color: colorScheme.primary,
+                            Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: colorScheme.primary.withValues(alpha: 0.12),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Icon(
+                                Icons.palette_rounded,
+                                color: colorScheme.primary,
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Text(
+                              'Accent Color Scheme',
+                              style: theme.textTheme.titleMedium?.copyWith(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const Divider(height: 24),
+                        Wrap(
+                          spacing: 12,
+                          runSpacing: 12,
+                          children: AppAccentColor.values.map((colorItem) {
+                            final isSelected =
+                                appProvider.accentColor == colorItem;
+                            return InkWell(
+                              onTap: () =>
+                                  appProvider.setAccentColor(colorItem),
+                              borderRadius: BorderRadius.circular(14),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 16, vertical: 12),
+                                decoration: BoxDecoration(
+                                  color: isSelected
+                                      ? colorItem.primary.withValues(alpha: 0.15)
+                                      : colorScheme.surfaceContainerHighest
+                                          .withValues(alpha: 0.4),
+                                  borderRadius: BorderRadius.circular(14),
+                                  border: Border.all(
+                                    color: isSelected
+                                        ? colorItem.primary
+                                        : Colors.transparent,
+                                    width: 2,
+                                  ),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Container(
+                                      width: 20,
+                                      height: 20,
+                                      decoration: BoxDecoration(
+                                        color: colorItem.primary,
+                                        shape: BoxShape.circle,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 10),
+                                    Text(
+                                      colorItem.label,
+                                      style: TextStyle(
+                                        fontWeight: isSelected
+                                            ? FontWeight.bold
+                                            : FontWeight.normal,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 24),
+
+                // Card 3: Profile State Editor & Avatar Picker
+                Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(20.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: colorScheme.primary.withValues(alpha: 0.12),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Icon(
+                                Icons.badge_rounded,
+                                color: colorScheme.primary,
+                              ),
                             ),
                             const SizedBox(width: 12),
                             Text(
@@ -157,6 +281,51 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           ],
                         ),
                         const Divider(height: 24),
+
+                        // Avatar Picker Row
+                        Text(
+                          'Select Profile Avatar Icon:',
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        Row(
+                          children: List.generate(
+                            AppProvider.avatarIcons.length,
+                            (index) {
+                              final iconData = AppProvider.avatarIcons[index];
+                              final isSelected =
+                                  appProvider.avatarIndex == index;
+                              return Padding(
+                                padding: const EdgeInsets.only(right: 12.0),
+                                child: InkWell(
+                                  onTap: () =>
+                                      appProvider.setAvatarIndex(index),
+                                  borderRadius: BorderRadius.circular(30),
+                                  child: Container(
+                                    padding: const EdgeInsets.all(10),
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: isSelected
+                                          ? colorScheme.primary
+                                          : colorScheme.surfaceContainerHighest,
+                                    ),
+                                    child: Icon(
+                                      iconData,
+                                      color: isSelected
+                                          ? colorScheme.onPrimary
+                                          : colorScheme.onSurfaceVariant,
+                                      size: 24,
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+
                         TextField(
                           controller: _nameController,
                           decoration: const InputDecoration(
@@ -169,7 +338,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         TextField(
                           controller: _roleController,
                           decoration: const InputDecoration(
-                            labelText: 'Role / Designation',
+                            labelText: 'Designation / Role',
                             border: OutlineInputBorder(),
                             prefixIcon: Icon(Icons.work),
                           ),
@@ -193,7 +362,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             style: ElevatedButton.styleFrom(
                               padding: const EdgeInsets.symmetric(vertical: 14),
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
+                                borderRadius: BorderRadius.circular(14),
                               ),
                             ),
                           ),
@@ -205,6 +374,63 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ],
             ),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ThemeChoiceCard extends StatelessWidget {
+  final String title;
+  final IconData icon;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  const _ThemeChoiceCard({
+    required this.title,
+    required this.icon,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(14),
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? colorScheme.primaryContainer
+              : colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(
+            color: isSelected ? colorScheme.primary : Colors.transparent,
+            width: 2,
+          ),
+        ),
+        child: Column(
+          children: [
+            Icon(
+              icon,
+              color: isSelected
+                  ? colorScheme.primary
+                  : colorScheme.onSurfaceVariant,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              title,
+              style: TextStyle(
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                color: isSelected
+                    ? colorScheme.onPrimaryContainer
+                    : colorScheme.onSurfaceVariant,
+              ),
+            ),
+          ],
         ),
       ),
     );

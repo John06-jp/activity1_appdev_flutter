@@ -13,8 +13,7 @@ void main() {
       ),
     );
 
-    // Verify that the title appears
-    expect(find.text('Flutter Laboratory Portfolio'), findsOneWidget);
-    expect(find.text('Master Compilation App'), findsOneWidget);
+    // Verify that the dashboard title appears
+    expect(find.text('Portfolio Dashboard'), findsOneWidget);
   });
 }
