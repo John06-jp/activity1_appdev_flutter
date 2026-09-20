@@ -81,7 +81,7 @@ class ActivityCard extends StatelessWidget {
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                     child: Text(
-                                      activity.category,
+                                      activity.subtitle,
                                       style: theme.textTheme.labelSmall?.copyWith(
                                         fontWeight: FontWeight.bold,
                                         color: activityColor,

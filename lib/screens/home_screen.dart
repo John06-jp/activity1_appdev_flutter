@@ -1,8 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/app_provider.dart';
+import '../providers/network_health_provider.dart';
+import '../services/network_diagnostics_service.dart';
 import '../models/activity_model.dart';
 import 'activities/labtrack_activity_screen.dart';
+import 'activities/network_diagnostics_dashboard_screen.dart';
+import 'activities/network_monitor_screen.dart';
+
+/// Route an activity card to its dedicated screen. The Network Diagnostic
+/// Dashboard (act_5) has its own screen; everything else opens the generic
+/// lab-activity detail screen.
+void openActivity(BuildContext context, ActivityItem activity) {
+  if (activity.routeName == '/network-diagnostics') {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => const NetworkDiagnosticsDashboardScreen(),
+      ),
+    );
+    return;
+  }
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (_) => LabTrackActivityScreen(activity: activity),
+    ),
+  );
+}
 
 class MainShell extends StatefulWidget {
   const MainShell({super.key});
@@ -130,6 +155,54 @@ class _NavItem extends StatelessWidget {
 }
 
 // ─────────────────────────────────────────────
+// Global network health chip (broadcast app-wide)
+// ─────────────────────────────────────────────
+class _NetworkHealthChip extends StatelessWidget {
+  final NetworkHealthTier tier;
+  final VoidCallback onTap;
+
+  const _NetworkHealthChip({required this.tier, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final color = NetworkHealthTier.fromValue(tier.colorValue);
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+        decoration: BoxDecoration(
+          color: color.withValues(alpha: 0.14),
+          borderRadius: BorderRadius.circular(30),
+          border: Border.all(color: color.withValues(alpha: 0.35)),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.speed_rounded, color: color, size: 15),
+            const SizedBox(width: 5),
+            Text(
+              tier.label,
+              style: TextStyle(
+                fontSize: 11.5,
+                fontWeight: FontWeight.bold,
+                color: color,
+              ),
+            ),
+            const SizedBox(width: 4),
+            Icon(
+              Icons.chevron_right_rounded,
+              size: 13,
+              color: isDark ? const Color(0xFF6B7280) : const Color(0xFF9CA3AF),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────
 // HOME TAB
 // ─────────────────────────────────────────────
 class HomeTab extends StatelessWidget {
@@ -140,6 +213,8 @@ class HomeTab extends StatelessWidget {
     final appProvider = context.watch<AppProvider>();
     final isDark = appProvider.isDarkMode;
     final activities = ActivityData.activities;
+    // App-wide network health broadcast from NetworkHealthProvider.
+    final health = context.watch<NetworkHealthProvider>();
 
     final bgColor = isDark ? const Color(0xFF0B0F19) : const Color(0xFFF0F4FF);
     final cardBg = isDark ? const Color(0xFF1A1F2E) : Colors.white;
@@ -183,11 +258,17 @@ class HomeTab extends StatelessWidget {
                   ),
                   Row(
                     children: [
-                      IconButton(
-                        icon: Icon(Icons.settings_outlined,
-                            color: textSecondary, size: 22),
-                        onPressed: () {},
-                      ),
+                      // Global network health indicator
+                      _NetworkHealthChip(tier: health.tier, onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) =>
+                                const NetworkDiagnosticsDashboardScreen(),
+                          ),
+                        );
+                      }),
+                      const SizedBox(width: 6),
                       CircleAvatar(
                         radius: 18,
                         backgroundColor: const Color(0xFF3B6FE8),
@@ -277,16 +358,7 @@ class HomeTab extends StatelessWidget {
                     cardBg: cardBg,
                     textPrimary: textPrimary,
                     textSecondary: textSecondary,
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => LabTrackActivityScreen(
-                            activity: activity,
-                          ),
-                        ),
-                      );
-                    },
+                    onTap: () => openActivity(context, activity),
                   );
                 }).toList(),
               ),
@@ -396,24 +468,32 @@ class ActivitiesTab extends StatelessWidget {
             color: textPrimary,
           ),
         ),
+        actions: [
+          IconButton(
+            tooltip: 'Open Network Monitor',
+            icon: const Icon(Icons.network_check_rounded),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const NetworkMonitorScreen(),
+                ),
+              );
+            },
+          ),
+          const SizedBox(width: 8),
+        ],
       ),
       body: ListView.separated(
         padding: const EdgeInsets.all(20),
         itemCount: activities.length,
-        separatorBuilder: (_, __) => const SizedBox(height: 14),
+        separatorBuilder: (_, _) => const SizedBox(height: 14),
         itemBuilder: (context, index) {
           final activity = activities[index];
           final completedCount =
               activity.tasks.where((t) => t.isCompleted).length;
           return GestureDetector(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => LabTrackActivityScreen(activity: activity),
-                ),
-              );
-            },
+            onTap: () => openActivity(context, activity),
             child: Container(
               padding: const EdgeInsets.all(18),
               decoration: BoxDecoration(
@@ -626,7 +706,7 @@ class SettingsTab extends StatelessWidget {
                         ),
                         Switch(
                           value: isDark,
-                          activeColor: const Color(0xFF3B6FE8),
+                          activeThumbColor: const Color(0xFF3B6FE8),
                           onChanged: (val) => appProvider.toggleTheme(val),
                         ),
                       ],

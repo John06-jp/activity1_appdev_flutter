@@ -95,5 +95,22 @@ class ActivityData {
             ActivityTask(title: 'Model Deployment', isCompleted: false),
           ],
         ),
+        ActivityItem(
+          id: 'act_5',
+          title: 'Activity 5',
+          subtitle: 'Network Diagnostic Dashboard',
+          description:
+              'Run idle ping, download and upload bandwidth tests, and '
+              'view the live connection health tier.',
+          icon: Icons.speed_rounded,
+          routeName: '/network-diagnostics',
+          themeColor: const Color(0xFF06B6D4),
+          tasks: [
+            ActivityTask(title: 'Idle Ping Test', isCompleted: false),
+            ActivityTask(title: 'Download Bandwidth Test', isCompleted: false),
+            ActivityTask(title: 'Upload Bandwidth Test', isCompleted: false),
+            ActivityTask(title: 'Health Tier Classification', isCompleted: false),
+          ],
+        ),
       ];
 }
