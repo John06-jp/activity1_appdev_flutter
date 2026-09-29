@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import 'providers/app_provider.dart';
 import 'providers/connectivity_provider.dart';
+import 'providers/mesh_provider.dart';
 import 'providers/network_health_provider.dart';
 import 'screens/splash_screen.dart';
 
@@ -19,6 +20,9 @@ void main() {
             monitorInterval: const Duration(minutes: 5),
           ),
         ),
+        // Mesh Chat — kept alive at the app level so the Nearby session
+        // survives screen push/pop.
+        ChangeNotifierProvider(create: (_) => MeshProvider()),
       ],
       child: const LabTrackApp(),
     ),

@@ -37,6 +37,9 @@ dependencies:
   provider: ^6.1.5+1
   connectivity_plus: ^6.0.5
   http: ^1.4.0
+  nearby_connections: ^4.0.0
+  permission_handler: ^11.3.0
+  uuid: ^4.4.0
 
 dev_dependencies:
   flutter_test:

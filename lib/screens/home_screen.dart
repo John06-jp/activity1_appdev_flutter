@@ -6,21 +6,10 @@ import '../services/network_diagnostics_service.dart';
 import '../models/activity_model.dart';
 import 'activities/labtrack_activity_screen.dart';
 import 'activities/network_diagnostics_dashboard_screen.dart';
-import 'activities/network_monitor_screen.dart';
+import 'mesh_chat_screen.dart';
 
-/// Route an activity card to its dedicated screen. The Network Diagnostic
-/// Dashboard (act_5) has its own screen; everything else opens the generic
-/// lab-activity detail screen.
+/// Route an activity card to its dedicated lab-activity detail screen.
 void openActivity(BuildContext context, ActivityItem activity) {
-  if (activity.routeName == '/network-diagnostics') {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => const NetworkDiagnosticsDashboardScreen(),
-      ),
-    );
-    return;
-  }
   Navigator.push(
     context,
     MaterialPageRoute(
@@ -362,6 +351,45 @@ class HomeTab extends StatelessWidget {
                   );
                 }).toList(),
               ),
+              const SizedBox(height: 28),
+
+              // ── Features section ───────────────────────────────────────
+              Text(
+                'Features',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: textPrimary,
+                ),
+              ),
+              const SizedBox(height: 14),
+              _FeatureCard(
+                icon: Icons.speed_rounded,
+                title: 'Network Diagnostics',
+                subtitle: 'Ping · Bandwidth · Health Tier',
+                description: 'Run real-time network tests and monitor your connection quality live.',
+                gradientColors: const [Color(0xFF06B6D4), Color(0xFF0284C7)],
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const NetworkDiagnosticsDashboardScreen(),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+              _FeatureCard(
+                icon: Icons.hub_rounded,
+                title: 'Local Mesh Chat',
+                subtitle: 'P2P · No Internet · Android',
+                description: 'Send messages between nearby devices using Bluetooth & Wi-Fi Direct.',
+                gradientColors: const [Color(0xFF7C3AED), Color(0xFF4F46E5)],
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const MeshChatScreen(),
+                  ),
+                ),
+              ),
             ],
           ),
         ),
@@ -440,6 +468,121 @@ class _ActivityGridCard extends StatelessWidget {
 }
 
 // ─────────────────────────────────────────────
+// FEATURE CARD (wide banner, not an activity)
+// ─────────────────────────────────────────────
+class _FeatureCard extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final String description;
+  final List<Color> gradientColors;
+  final VoidCallback onTap;
+
+  const _FeatureCard({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.description,
+    required this.gradientColors,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final cardBg = isDark ? const Color(0xFF1A1F2E) : Colors.white;
+    final textPrimary = isDark ? Colors.white : const Color(0xFF0F172A);
+    final textSecondary =
+        isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280);
+
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: cardBg,
+          borderRadius: BorderRadius.circular(18),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.07),
+              blurRadius: 10,
+              offset: const Offset(0, 3),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            // Gradient icon block
+            Container(
+              width: 52,
+              height: 52,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: gradientColors,
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: Icon(icon, color: Colors.white, size: 26),
+            ),
+            const SizedBox(width: 14),
+            // Text
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                      color: textPrimary,
+                    ),
+                  ),
+                  const SizedBox(height: 3),
+                  // Pill chip subtitle
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 8, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: gradientColors[0].withValues(alpha: 0.14),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      subtitle,
+                      style: TextStyle(
+                        fontSize: 10.5,
+                        fontWeight: FontWeight.w600,
+                        color: gradientColors[0],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 5),
+                  Text(
+                    description,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: textSecondary,
+                      height: 1.4,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 8),
+            Icon(Icons.chevron_right_rounded,
+                color: textSecondary, size: 22),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────
 // ACTIVITIES TAB
 // ─────────────────────────────────────────────
 class ActivitiesTab extends StatelessWidget {
@@ -468,21 +611,7 @@ class ActivitiesTab extends StatelessWidget {
             color: textPrimary,
           ),
         ),
-        actions: [
-          IconButton(
-            tooltip: 'Open Network Monitor',
-            icon: const Icon(Icons.network_check_rounded),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => const NetworkMonitorScreen(),
-                ),
-              );
-            },
-          ),
-          const SizedBox(width: 8),
-        ],
+        actions: const [SizedBox(width: 8)],
       ),
       body: ListView.separated(
         padding: const EdgeInsets.all(20),
