@@ -35,22 +35,36 @@ class MeshService {
   Future<void> start(String userName) async {
     _seen.clear();
 
-    await Nearby().startAdvertising(
-      userName,
-      _strategy,
-      onConnectionInitiated: _onInitiated,
-      onConnectionResult: _onResult,
-      onDisconnected: _onDisconnected,
-      serviceId: _serviceId,
-    );
+    try {
+      await Nearby().startAdvertising(
+        userName,
+        _strategy,
+        onConnectionInitiated: _onInitiated,
+        onConnectionResult: _onResult,
+        onDisconnected: _onDisconnected,
+        serviceId: _serviceId,
+      );
 
-    await Nearby().startDiscovery(
-      userName,
-      _strategy,
-      onEndpointFound: (id, name, sid) => onPeerFound(id, name),
-      onEndpointLost: (id) => onPeerLost(id ?? ''),
-      serviceId: _serviceId,
-    );
+      await Nearby().startDiscovery(
+        userName,
+        _strategy,
+        onEndpointFound: (id, name, sid) => onPeerFound(id, name),
+        onEndpointLost: (id) => onPeerLost(id ?? ''),
+        serviceId: _serviceId,
+      );
+    } catch (_) {
+      await _rollbackStart();
+      rethrow;
+    }
+  }
+
+  Future<void> _rollbackStart() async {
+    try {
+      await Nearby().stopAdvertising();
+    } catch (_) {}
+    try {
+      await Nearby().stopDiscovery();
+    } catch (_) {}
   }
 
   /// Stop everything and clear connection state.

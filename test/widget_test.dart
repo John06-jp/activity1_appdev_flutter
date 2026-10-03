@@ -9,6 +9,14 @@ import 'package:flutter_activity1_appdev/screens/activities/network_diagnostics_
 import 'package:flutter_activity1_appdev/screens/mesh_chat_screen.dart';
 
 void main() {
+  test('MeshProvider ignores a start request while active', () async {
+    final mesh = MeshProvider()..status = MeshStatus.active;
+
+    await mesh.start('Test device');
+
+    expect(mesh.status, MeshStatus.active);
+  });
+
   testWidgets('Mesh Chat idle state fits a compact viewport',
       (WidgetTester tester) async {
     tester.view.physicalSize = const Size(360, 360);

@@ -44,6 +44,8 @@ class MeshProvider extends ChangeNotifier {
   // ── Lifecycle ─────────────────────────────────────────────────────────────
 
   Future<void> start(String userName) async {
+    if (status == MeshStatus.starting || status == MeshStatus.active) return;
+
     status = MeshStatus.starting;
     errorMessage = '';
     notifyListeners();
