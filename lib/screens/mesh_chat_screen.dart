@@ -501,10 +501,9 @@ class _IdleState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(40),
-        child: Column(
+    return _ScrollableCentered(
+      padding: const EdgeInsets.all(40),
+      child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
@@ -546,14 +545,18 @@ class _IdleState extends StatelessWidget {
                 children: [
                   Icon(Icons.android_rounded, size: 14, color: Color(0xFF10B981)),
                   SizedBox(width: 4),
-                  Text('Android only · Requires two or more physical devices',
+                  Flexible(
+                    child: Text(
+                      'Android only · Requires two or more physical devices',
+                      textAlign: TextAlign.center,
                       style: TextStyle(
-                          fontSize: 11, color: Color(0xFF10B981))),
+                          fontSize: 11, color: Color(0xFF10B981)),
+                    ),
+                  ),
                 ],
               ),
             ),
           ],
-        ),
       ),
     );
   }
@@ -571,10 +574,9 @@ class _NoMessagesState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(40),
-        child: Column(
+    return _ScrollableCentered(
+      padding: const EdgeInsets.all(40),
+      child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(
@@ -604,7 +606,6 @@ class _NoMessagesState extends StatelessWidget {
               style: TextStyle(color: textSecondary, height: 1.5, fontSize: 13),
             ),
           ],
-        ),
       ),
     );
   }
@@ -622,10 +623,9 @@ class _ErrorState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(40),
-        child: Column(
+    return _ScrollableCentered(
+      padding: const EdgeInsets.all(40),
+      child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
@@ -667,6 +667,24 @@ class _ErrorState extends StatelessWidget {
               ),
             ),
           ],
+      ),
+    );
+  }
+}
+
+class _ScrollableCentered extends StatelessWidget {
+  final EdgeInsets padding;
+  final Widget child;
+
+  const _ScrollableCentered({required this.padding, required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) => SingleChildScrollView(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(minHeight: constraints.maxHeight),
+          child: Center(child: Padding(padding: padding, child: child)),
         ),
       ),
     );
