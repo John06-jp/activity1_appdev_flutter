@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -181,14 +182,18 @@ class MeshProvider extends ChangeNotifier {
   Future<bool> _requestPermissions() async {
     if (!Platform.isAndroid) return true; // iOS guard
 
-    final statuses = await [
-      Permission.bluetooth,
-      Permission.bluetoothAdvertise,
-      Permission.bluetoothConnect,
-      Permission.bluetoothScan,
+    final sdkInt = (await DeviceInfoPlugin().androidInfo).version.sdkInt;
+    final permissions = <Permission>[
+      if (sdkInt >= 31) ...[
+        Permission.bluetoothAdvertise,
+        Permission.bluetoothConnect,
+        Permission.bluetoothScan,
+      ],
       Permission.locationWhenInUse,
-      Permission.nearbyWifiDevices,
-    ].request();
+      if (sdkInt >= 33) Permission.nearbyWifiDevices,
+    ];
+
+    final statuses = await permissions.request();
 
     return statuses.values.every(
       (s) => s == PermissionStatus.granted || s == PermissionStatus.limited,
