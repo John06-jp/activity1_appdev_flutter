@@ -1,0 +1,7 @@
+﻿[
+  {"id":"LOC01","name":"My Home","description":"Collect coordinates with household permission.","barangay":"Poblacion","latitude":null,"longitude":null,"radiusMeters":50,"verified":false},
+  {"id":"LOC02","name":"Friend's Home","description":"Collect coordinates with the owner's permission.","barangay":"Poblacion","latitude":null,"longitude":null,"radiusMeters":50,"verified":false},
+  {"id":"LOC03","name":"Family Garden","description":"Identify an eligible garden or small farm.","barangay":"Poblacion","latitude":null,"longitude":null,"radiusMeters":50,"verified":false},
+  {"id":"LOC04","name":"Neighborhood Rest Spot","description":"Identify a safe, unnamed resting place.","barangay":"Poblacion","latitude":null,"longitude":null,"radiusMeters":50,"verified":false},
+  {"id":"LOC05","name":"Local Scenic Spot","description":"Identify a safe, unnamed open space.","barangay":"Poblacion","latitude":null,"longitude":null,"radiusMeters":50,"verified":false}
+]

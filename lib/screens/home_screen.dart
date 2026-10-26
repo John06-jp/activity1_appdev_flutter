@@ -7,6 +7,7 @@ import '../models/activity_model.dart';
 import 'activities/labtrack_activity_screen.dart';
 import 'activities/network_diagnostics_dashboard_screen.dart';
 import 'mesh_chat_screen.dart';
+import 'activities/local_spots_screen.dart';
 
 /// Route an activity card to its dedicated lab-activity detail screen.
 void openActivity(BuildContext context, ActivityItem activity) {
@@ -363,6 +364,17 @@ class HomeTab extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 14),
+              _FeatureCard(
+                icon: Icons.map_outlined,
+                title: 'Bayugan Local Spots',
+                subtitle: 'Custom map and geofence tracker',
+                description: 'Explore verified neighborhood spots and record entry and exit events.',
+                gradientColors: const [Color(0xFF2E8B57), Color(0xFF217565)],
+                onTap: () => Navigator.push(context, MaterialPageRoute(
+                  builder: (_) => const LocalSpotsScreen(),
+                )),
+              ),
+              const SizedBox(height: 12),
               _FeatureCard(
                 icon: Icons.speed_rounded,
                 title: 'Network Diagnostics',

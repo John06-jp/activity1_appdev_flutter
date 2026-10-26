@@ -159,3 +159,9 @@ Complete at least one successful entry and exit test for every location. Record 
 - [Agusan del Sur Provincial Government — Bayugan City](https://agusandelsur.gov.ph/municipalities/bayugan-city/)
 
 These sources support the city background. They do not verify the five proposed custom locations or their absence from Google Maps.
+
+## 15. Implementation progress (October 26, 2026)
+
+The tracker is integrated into LabTrack under Home > Features > Bayugan Local Spots. The initial prototype implements the map, verified-location filtering, details, foreground GPS, geofence confirmation, in-app alerts, and persistent local history. See [LOCAL_SPOTS.md](LOCAL_SPOTS.md) for setup and detection settings.
+
+Field collection remains pending. The five asset records contain null coordinates and `verified: false`; no invented place coordinates are used. Personal verification, final inventory, real-device testing, and submission evidence remain required.
