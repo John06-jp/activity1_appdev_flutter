@@ -1,7 +1,7 @@
 ﻿[
-  {"id":"LOC01","name":"My Home","description":"Collect coordinates with household permission.","barangay":"Poblacion","latitude":null,"longitude":null,"radiusMeters":50,"verified":false},
-  {"id":"LOC02","name":"Friend's Home","description":"Collect coordinates with the owner's permission.","barangay":"Poblacion","latitude":null,"longitude":null,"radiusMeters":50,"verified":false},
-  {"id":"LOC03","name":"Family Garden","description":"Identify an eligible garden or small farm.","barangay":"Poblacion","latitude":null,"longitude":null,"radiusMeters":50,"verified":false},
-  {"id":"LOC04","name":"Neighborhood Rest Spot","description":"Identify a safe, unnamed resting place.","barangay":"Poblacion","latitude":null,"longitude":null,"radiusMeters":50,"verified":false},
-  {"id":"LOC05","name":"Local Scenic Spot","description":"Identify a safe, unnamed open space.","barangay":"Poblacion","latitude":null,"longitude":null,"radiusMeters":50,"verified":false}
+  {"id":"LOC01","name":"Sample Location 1 - Center","description":"Selected sample map point near central Bayugan. Coordinates are for demonstrating the map and geofence, not a field-verified landmark.","barangay":"Poblacion","latitude":8.714,"longitude":125.748,"radiusMeters":50,"verified":true},
+  {"id":"LOC02","name":"Sample Location 2 - North","description":"Selected sample map point north of the center for demonstrating a 50-meter geofence.","barangay":"Poblacion","latitude":8.716,"longitude":125.748,"radiusMeters":50,"verified":true},
+  {"id":"LOC03","name":"Sample Location 3 - East","description":"Selected sample map point east of the center for demonstrating a 50-meter geofence.","barangay":"Poblacion","latitude":8.714,"longitude":125.75,"radiusMeters":50,"verified":true},
+  {"id":"LOC04","name":"Sample Location 4 - South","description":"Selected sample map point south of the center for demonstrating a 50-meter geofence.","barangay":"Poblacion","latitude":8.712,"longitude":125.748,"radiusMeters":50,"verified":true},
+  {"id":"LOC05","name":"Sample Location 5 - West","description":"Selected sample map point west of the center for demonstrating a 50-meter geofence.","barangay":"Poblacion","latitude":8.714,"longitude":125.746,"radiusMeters":50,"verified":true}
 ]

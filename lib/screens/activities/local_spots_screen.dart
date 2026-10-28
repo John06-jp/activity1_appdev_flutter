@@ -32,6 +32,18 @@ class _LocalSpotsScreenState extends State<LocalSpotsScreen>
   int _session = 0;
   String _message = 'Load your verified locations to begin.';
 
+  Color _spotColor(LocalSpot spot) {
+    const colors = [
+      Color(0xFFD32F2F),
+      Color(0xFF1976D2),
+      Color(0xFF388E3C),
+      Color(0xFFF57C00),
+      Color(0xFF7B1FA2),
+    ];
+    final index = _spots.indexWhere((item) => item.id == spot.id);
+    return colors[(index < 0 ? 0 : index) % colors.length];
+  }
+
   @override
   void initState() {
     super.initState();
@@ -274,7 +286,6 @@ class _LocalSpotsScreenState extends State<LocalSpotsScreen>
     final center = ready.isEmpty
         ? const LatLng(8.714, 125.748)
         : LatLng(ready.first.latitude!, ready.first.longitude!);
-    final color = Theme.of(context).colorScheme.primary;
     return Scaffold(
       appBar: AppBar(
         title: const Text('Bayugan Local Spots'),
@@ -341,8 +352,8 @@ class _LocalSpotsScreenState extends State<LocalSpotsScreen>
                                     point: LatLng(s.latitude!, s.longitude!),
                                     radius: s.radius,
                                     useRadiusInMeter: true,
-                                    color: color.withValues(alpha: 0.15),
-                                    borderColor: color,
+                                    color: _spotColor(s).withValues(alpha: 0.15),
+                                    borderColor: _spotColor(s),
                                     borderStrokeWidth: 2,
                                   ),
                                 )
@@ -362,8 +373,8 @@ class _LocalSpotsScreenState extends State<LocalSpotsScreen>
                                     tooltip: spot.name,
                                     onPressed: () => _details(spot),
                                     icon: Icon(
-                                      Icons.location_on,
-                                      color: color,
+                                      Icons.flag_rounded,
+                                      color: _spotColor(spot),
                                       size: 36,
                                     ),
                                   ),
@@ -476,8 +487,9 @@ class _LocalSpotsScreenState extends State<LocalSpotsScreen>
                           contentPadding: EdgeInsets.zero,
                           leading: Icon(
                             spot.ready
-                                ? Icons.place_outlined
+                                ? Icons.flag_rounded
                                 : Icons.edit_location_alt_outlined,
+                            color: _spotColor(spot),
                           ),
                           title: Text(spot.name),
                           subtitle: Text(
