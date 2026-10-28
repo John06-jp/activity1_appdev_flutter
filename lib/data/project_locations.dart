@@ -1,0 +1,55 @@
+import '../models/local_spot.dart';
+
+// Sample destinations approved for this project, independent of asset caches.
+List<LocalSpot> projectLocations() => [
+  LocalSpot.fromJson({
+    'id': "LOC01",
+    'name': "My Home",
+    'description': "User-approved sample destination for the Bayugan City map project.",
+    'barangay': "Poblacion",
+    'latitude': 8.716,
+    'longitude': 125.747,
+    'radiusMeters': 50,
+    'verified': true,
+  }),
+  LocalSpot.fromJson({
+    'id': "LOC02",
+    'name': "Friend’s Home",
+    'description': "User-approved sample destination for the Bayugan City map project.",
+    'barangay': "Poblacion",
+    'latitude': 8.717,
+    'longitude': 125.75,
+    'radiusMeters': 50,
+    'verified': true,
+  }),
+  LocalSpot.fromJson({
+    'id': "LOC03",
+    'name': "Family Garden",
+    'description': "User-approved sample destination for the Bayugan City map project.",
+    'barangay': "Poblacion",
+    'latitude': 8.712,
+    'longitude': 125.747,
+    'radiusMeters': 50,
+    'verified': true,
+  }),
+  LocalSpot.fromJson({
+    'id': "LOC04",
+    'name': "Neighborhood Rest Spot",
+    'description': "User-approved sample destination for the Bayugan City map project.",
+    'barangay': "Poblacion",
+    'latitude': 8.7135,
+    'longitude': 125.75,
+    'radiusMeters': 50,
+    'verified': true,
+  }),
+  LocalSpot.fromJson({
+    'id': "LOC05",
+    'name': "Local Scenic Spot",
+    'description': "User-approved sample destination for the Bayugan City map project.",
+    'barangay': "Poblacion",
+    'latitude': 8.7155,
+    'longitude': 125.752,
+    'radiusMeters': 50,
+    'verified': true,
+  }),
+];

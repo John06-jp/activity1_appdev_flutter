@@ -2,15 +2,17 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../models/local_spot.dart';
+import '../../data/project_locations.dart';
 
 class LocalSpotsScreen extends StatefulWidget {
-  const LocalSpotsScreen({super.key});
+  const LocalSpotsScreen({super.key, this.tileProvider});
+
+  final TileProvider? tileProvider;
   @override
   State<LocalSpotsScreen> createState() => _LocalSpotsScreenState();
 }
@@ -31,18 +33,17 @@ class _LocalSpotsScreenState extends State<LocalSpotsScreen>
       _starting = false,
       _tileError = false;
   int _session = 0;
-  String _message = 'Load your verified locations to begin.';
+  String _message = 'Loading project locations.';
 
   Color _spotColor(LocalSpot spot) {
-    const colors = [
-      Color(0xFFD32F2F),
-      Color(0xFF1976D2),
-      Color(0xFF388E3C),
-      Color(0xFFF57C00),
-      Color(0xFF7B1FA2),
-    ];
-    final index = _spots.indexWhere((item) => item.id == spot.id);
-    return colors[(index < 0 ? 0 : index) % colors.length];
+    const colors = {
+      'LOC01': Color(0xFFD32F2F), // My Home: red.
+      'LOC02': Color(0xFF1976D2), // Friend’s Home: blue.
+      'LOC03': Color(0xFF388E3C), // Family Garden: green.
+      'LOC04': Color(0xFFF57C00), // Neighborhood Rest Spot: orange.
+      'LOC05': Color(0xFF7B1FA2), // Local Scenic Spot: purple.
+    };
+    return colors[spot.id] ?? Theme.of(context).colorScheme.primary;
   }
 
   @override
@@ -52,13 +53,38 @@ class _LocalSpotsScreenState extends State<LocalSpotsScreen>
     _load();
   }
 
+  @override
+  void reassemble() {
+    super.reassemble();
+    _load();
+  }
+
   Future<void> _load() async {
+    setState(() => _loading = true);
     try {
-      final raw = await rootBundle.loadString('assets/locations.json');
-      final spots = (jsonDecode(raw.replaceFirst('\uFEFF', '')) as List)
-          .map((e) => LocalSpot.fromJson(Map<String, dynamic>.from(e as Map)))
-          .toList();
+      final spots = projectLocations();
+      if (!mounted) return;
+      setState(() {
+        _spots = spots;
+        _loading = false;
+        _message =
+            '${spots.where((s) => s.ready).length} of ${spots.length} flags loaded. Tap a flag for its location name.';
+      });
+    } catch (_) {
+      if (mounted) {
+        setState(() {
+          _loading = false;
+          _message = 'Could not load locations. Tap Reload locations to retry.';
+        });
+      }
+      return;
+    }
+
+    // Saved history must never prevent destination flags from appearing.
+    try {
       final storage = await SharedPreferences.getInstance();
+      if (!mounted) return;
+      _storage = storage;
       final saved = storage.getString('local_spots_events');
       final events = saved == null
           ? <Map<String, dynamic>>[]
@@ -66,23 +92,27 @@ class _LocalSpotsScreenState extends State<LocalSpotsScreen>
                 .map((e) => Map<String, dynamic>.from(e as Map))
                 .toList();
       if (!mounted) return;
-      setState(() {
-        _spots = spots;
-        _storage = storage;
-        _events = events;
-        _loading = false;
-        _message =
-            '${spots.where((s) => s.ready).length} of ${spots.length} locations verified. Tracking works while this screen is open.';
-      });
+      setState(() => _events = events);
     } catch (_) {
       if (mounted) {
         setState(() {
-          _loading = false;
           _message =
-              'Could not load locations or saved history. Check location data and restart.';
+              '${_spots.where((s) => s.ready).length} flags loaded. Saved history could not be loaded.';
         });
       }
     }
+  }
+
+  CameraFit? get _locationsFit {
+    final ready = _spots.where((s) => s.ready).toList();
+    if (ready.isEmpty) return null;
+    return CameraFit.bounds(
+      bounds: LatLngBounds.fromPoints([
+        for (final spot in ready) LatLng(spot.latitude!, spot.longitude!),
+      ]),
+      padding: const EdgeInsets.fromLTRB(64, 84, 64, 28),
+      maxZoom: 16,
+    );
   }
 
   Future<void> _persist() {
@@ -272,7 +302,7 @@ class _LocalSpotsScreenState extends State<LocalSpotsScreen>
                 )
               else
                 const Text(
-                  'Pending field verification. Collect coordinates, check for an existing Google Maps listing, and obtain permission before enabling this location.',
+                  'This location needs valid coordinates before it can appear on the map.',
                 ),
             ],
           ),
@@ -284,13 +314,23 @@ class _LocalSpotsScreenState extends State<LocalSpotsScreen>
   @override
   Widget build(BuildContext context) {
     final ready = _spots.where((s) => s.ready).toList();
-    final center = ready.isEmpty
-        ? const LatLng(8.714, 125.748)
-        : LatLng(ready.first.latitude!, ready.first.longitude!);
+    const center = LatLng(8.714, 125.748); // Bayugan City.
     return Scaffold(
       appBar: AppBar(
         title: const Text('Bayugan Local Spots'),
         actions: [
+          IconButton(
+            tooltip: 'Reload locations',
+            icon: const Icon(Icons.refresh),
+            onPressed: _loading ? null : _load,
+          ),
+          IconButton(
+            tooltip: 'Show all flags',
+            icon: const Icon(Icons.zoom_out_map),
+            onPressed: _loading || ready.isEmpty
+                ? null
+                : () => _map.fitCamera(_locationsFit!),
+          ),
           IconButton(
             tooltip: 'Tracking help',
             icon: const Icon(Icons.help_outline),
@@ -300,7 +340,7 @@ class _LocalSpotsScreenState extends State<LocalSpotsScreen>
                 title: const Text('Outdoor tracking'),
                 content: const SingleChildScrollView(
                   child: Text(
-                    'Tracking stops when you leave this screen or the app leaves the foreground.\n\nAllow precise location and enable GPS. Readings must be at most 15 seconds old, with accuracy within 25 m or half the fence radius. Three consecutive reliable readings confirm a transition. Readings whose accuracy overlaps a boundary do not trigger alerts.\n\nThe first reading establishes status without an entry event. GPS drift can delay alerts. Map tiles need internet; GPS can continue without them.\n\nOnly verified locations appear on the map. Exact private coordinates should not appear in public screenshots.',
+                    'Tracking stops when you leave this screen or the app leaves the foreground.\n\nAllow precise location and enable GPS. Readings must be at most 15 seconds old, with accuracy within 25 m or half the fence radius. Three consecutive reliable readings confirm a transition. Readings whose accuracy overlaps a boundary do not trigger alerts.\n\nThe first reading establishes status without an entry event. GPS drift can delay alerts. Map tiles need internet; GPS can continue without them.\n\nThe five project destinations use your approved sample coordinates.',
                   ),
                 ),
                 actions: [
@@ -327,19 +367,11 @@ class _LocalSpotsScreenState extends State<LocalSpotsScreen>
                         options: MapOptions(
                           initialCenter: center,
                           initialZoom: 16,
-                          initialCameraFit: ready.isEmpty
-                              ? null
-                              : CameraFit.bounds(
-                                  bounds: LatLngBounds.fromPoints([
-                                    for (final spot in ready)
-                                      LatLng(spot.latitude!, spot.longitude!),
-                                  ]),
-                                  padding: const EdgeInsets.fromLTRB(64, 84, 64, 28),
-                                  maxZoom: 16,
-                                ),
+                          initialCameraFit: _locationsFit,
                         ),
                         children: [
                           TileLayer(
+                            tileProvider: widget.tileProvider,
                             urlTemplate:
                                 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
                             userAgentPackageName:
@@ -501,7 +533,7 @@ class _LocalSpotsScreenState extends State<LocalSpotsScreen>
                         const Padding(
                           padding: EdgeInsets.only(top: 8),
                           child: Text(
-                            'Setup pending: collect and verify five locations in one barangay. No placeholder coordinates are plotted.',
+                            'Some locations have missing or invalid coordinates. Reload locations to retry.',
                           ),
                         ),
                       const SizedBox(height: 12),
@@ -548,8 +580,10 @@ class _LocalSpotsScreenState extends State<LocalSpotsScreen>
                           title: Text(spot.name),
                           subtitle: Text(
                             !spot.ready
-                                ? 'Pending verification'
-                                : '${_tracker.states[spot.id]?.name ?? 'unknown'} • ${_tracker.distances[spot.id]?.toStringAsFixed(0) ?? '—'} m away',
+                                ? 'Coordinates unavailable'
+                                : !_tracking
+                                ? 'Verified sample location'
+                                : '${_tracker.states[spot.id]?.name ?? 'unknown'} ? ${_tracker.distances[spot.id]?.toStringAsFixed(0) ?? '?'} m away',
                           ),
                           trailing: const Icon(Icons.chevron_right),
                           onTap: () => _details(spot),
