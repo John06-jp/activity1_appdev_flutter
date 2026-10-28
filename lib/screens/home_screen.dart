@@ -223,41 +223,51 @@ class HomeTab extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Text(
-                            'Hello, ${appProvider.userName} ',
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color: textPrimary,
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Flexible(
+                              child: Text(
+                                'Hello, ${appProvider.userName} ',
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                  color: textPrimary,
+                                ),
+                              ),
                             ),
-                          ),
-                          const Text('👋', style: TextStyle(fontSize: 20)),
-                        ],
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        'Welcome back to your lab activities!',
-                        style: TextStyle(fontSize: 13, color: textSecondary),
-                      ),
-                    ],
+                            const Text('👋', style: TextStyle(fontSize: 20)),
+                          ],
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          'Welcome back to your lab activities!',
+                          style: TextStyle(fontSize: 13, color: textSecondary),
+                        ),
+                      ],
+                    ),
                   ),
+                  const SizedBox(width: 12),
                   Row(
                     children: [
                       // Global network health indicator
-                      _NetworkHealthChip(tier: health.tier, onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) =>
-                                const NetworkDiagnosticsDashboardScreen(),
-                          ),
-                        );
-                      }),
+                      _NetworkHealthChip(
+                        tier: health.tier,
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) =>
+                                  const NetworkDiagnosticsDashboardScreen(),
+                            ),
+                          );
+                        },
+                      ),
                       const SizedBox(width: 6),
                       CircleAvatar(
                         radius: 18,
@@ -267,9 +277,10 @@ class HomeTab extends StatelessWidget {
                               ? appProvider.userName[0].toUpperCase()
                               : 'J',
                           style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold),
+                            color: Colors.white,
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                     ],

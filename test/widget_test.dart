@@ -7,6 +7,7 @@ import 'package:flutter_activity1_appdev/providers/mesh_provider.dart';
 import 'package:flutter_activity1_appdev/providers/network_health_provider.dart';
 import 'package:flutter_activity1_appdev/screens/activities/network_diagnostics_dashboard_screen.dart';
 import 'package:flutter_activity1_appdev/screens/mesh_chat_screen.dart';
+import 'package:flutter_activity1_appdev/screens/home_screen.dart';
 
 void main() {
   test('MeshProvider ignores a start request while active', () async {
@@ -15,6 +16,31 @@ void main() {
     await mesh.start('Test device');
 
     expect(mesh.status, MeshStatus.active);
+  });
+
+  testWidgets('Home header fits a narrow viewport with a long name', (
+    WidgetTester tester,
+  ) async {
+    tester.view.physicalSize = const Size(375.2, 900);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.reset);
+
+    final app = AppProvider()
+      ..updateProfile(name: 'A student with a very long name', role: 'Student');
+    await tester.pumpWidget(
+      MultiProvider(
+        providers: [
+          ChangeNotifierProvider.value(value: app),
+          ChangeNotifierProvider(
+            create: (_) => NetworkHealthProvider(autoStart: false),
+          ),
+        ],
+        child: const MaterialApp(home: HomeTab()),
+      ),
+    );
+    expect(tester.takeException(), isNull);
+    expect(find.text('Hello, ${app.userName} '), findsOneWidget);
+    expect(find.byIcon(Icons.speed_rounded), findsWidgets);
   });
 
   testWidgets('Mesh Chat idle state fits a compact viewport',
