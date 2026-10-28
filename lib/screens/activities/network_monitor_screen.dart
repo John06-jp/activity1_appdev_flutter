@@ -116,7 +116,13 @@ class _NetworkMonitorScreenState extends State<NetworkMonitorScreen> {
                   color: colorScheme.onPrimaryContainer, size: 20),
             ),
             const SizedBox(width: 10),
-            const Text('Network Monitor'),
+            const Flexible(
+              child: Text(
+                'Network Monitor',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
           ],
         ),
         actions: [

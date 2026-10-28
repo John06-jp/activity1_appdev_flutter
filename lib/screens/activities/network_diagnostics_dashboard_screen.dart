@@ -45,7 +45,13 @@ class _NetworkDiagnosticsDashboardScreenState
                   color: colorScheme.onPrimaryContainer, size: 20),
             ),
             const SizedBox(width: 10),
-            const Text('Network Diagnostic Dashboard'),
+            const Flexible(
+              child: Text(
+                'Network Diagnostic Dashboard',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
           ],
         ),
         actions: [

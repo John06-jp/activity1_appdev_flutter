@@ -91,5 +91,22 @@ void main() {
     expect(find.text('Idle Ping'), findsOneWidget);
     expect(find.text('Download Bandwidth'), findsOneWidget);
     expect(find.text('Upload Bandwidth'), findsOneWidget);
+
+    // Exercise the actual toolbar with narrow title space and a back button.
+    final appBar = tester.widget<AppBar>(find.byType(AppBar));
+    tester.view.physicalSize = const Size(391.2, 800);
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          appBar: AppBar(
+            leading: const BackButton(),
+            title: appBar.title,
+            actions: appBar.actions,
+          ),
+        ),
+      ),
+    );
+    expect(tester.takeException(), isNull);
+    expect(find.text('Network Diagnostic Dashboard'), findsOneWidget);
   });
 }
