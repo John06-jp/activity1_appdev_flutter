@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -326,6 +327,16 @@ class _LocalSpotsScreenState extends State<LocalSpotsScreen>
                         options: MapOptions(
                           initialCenter: center,
                           initialZoom: 16,
+                          initialCameraFit: ready.isEmpty
+                              ? null
+                              : CameraFit.bounds(
+                                  bounds: LatLngBounds.fromPoints([
+                                    for (final spot in ready)
+                                      LatLng(spot.latitude!, spot.longitude!),
+                                  ]),
+                                  padding: const EdgeInsets.fromLTRB(64, 84, 64, 28),
+                                  maxZoom: 16,
+                                ),
                         ),
                         children: [
                           TileLayer(
@@ -352,9 +363,9 @@ class _LocalSpotsScreenState extends State<LocalSpotsScreen>
                                     point: LatLng(s.latitude!, s.longitude!),
                                     radius: s.radius,
                                     useRadiusInMeter: true,
-                                    color: _spotColor(s).withValues(alpha: 0.15),
-                                    borderColor: _spotColor(s),
-                                    borderStrokeWidth: 2,
+                                    color: _spotColor(s).withValues(alpha: 0.05),
+                                    borderColor: _spotColor(s).withValues(alpha: 0.55),
+                                    borderStrokeWidth: 1,
                                   ),
                                 )
                                 .toList(),
@@ -367,15 +378,58 @@ class _LocalSpotsScreenState extends State<LocalSpotsScreen>
                                     spot.latitude!,
                                     spot.longitude!,
                                   ),
-                                  width: 48,
-                                  height: 48,
-                                  child: IconButton(
-                                    tooltip: spot.name,
-                                    onPressed: () => _details(spot),
-                                    icon: Icon(
-                                      Icons.flag_rounded,
-                                      color: _spotColor(spot),
-                                      size: 36,
+                                  width: 112,
+                                  height: 66,
+                                  alignment: Alignment.topCenter,
+                                  rotate: true,
+                                  child: Tooltip(
+                                    message: spot.name,
+                                    child: Semantics(
+                                      label: spot.name,
+                                      button: true,
+                                      child: GestureDetector(
+                                        behavior: HitTestBehavior.opaque,
+                                        onTap: () => _details(spot),
+                                        child: Column(
+                                          children: [
+                                            Container(
+                                              width: 112,
+                                              height: 34,
+                                              alignment: Alignment.center,
+                                              padding: const EdgeInsets.symmetric(
+                                                horizontal: 3,
+                                              ),
+                                              decoration: BoxDecoration(
+                                                color: Colors.white.withValues(
+                                                  alpha: 0.94,
+                                                ),
+                                                borderRadius: BorderRadius.circular(4),
+                                                border: Border.all(
+                                                  color: _spotColor(spot),
+                                                ),
+                                              ),
+                                              child: Text(
+                                                spot.name,
+                                                textAlign: TextAlign.center,
+                                                maxLines: 2,
+                                                overflow: TextOverflow.ellipsis,
+                                                style: const TextStyle(
+                                                  color: Color(0xFF1F2937),
+                                                  fontSize: 10.5,
+                                                  height: 1.15,
+                                                  fontWeight: FontWeight.w600,
+                                                ),
+                                              ),
+                                            ),
+                                            CustomPaint(
+                                              size: const Size(32, 32),
+                                              painter: _LocationFlagPainter(
+                                                _spotColor(spot),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -576,4 +630,43 @@ class _LocalSpotsScreenState extends State<LocalSpotsScreen>
             ),
     );
   }
+}
+
+
+/// The pole ends at the bottom center, which is anchored to the map coordinate.
+class _LocationFlagPainter extends CustomPainter {
+  const _LocationFlagPainter(this.color);
+
+  final Color color;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final poleX = size.width / 2;
+    final flag = ui.Path()
+      ..moveTo(poleX, 2)
+      ..lineTo(size.width - 1, 2)
+      ..lineTo(size.width - 5, 9)
+      ..lineTo(size.width - 1, 16)
+      ..lineTo(poleX, 16)
+      ..close();
+    canvas.drawPath(flag, Paint()..color = color);
+    canvas.drawPath(
+      flag,
+      Paint()
+        ..color = Colors.white
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 1,
+    );
+    canvas.drawLine(
+      Offset(poleX, 1),
+      Offset(poleX, size.height),
+      Paint()
+        ..color = const Color(0xFF374151)
+        ..strokeWidth = 2,
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant _LocationFlagPainter oldDelegate) =>
+      oldDelegate.color != color;
 }

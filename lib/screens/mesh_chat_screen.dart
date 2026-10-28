@@ -505,7 +505,7 @@ class _IdleState extends StatelessWidget {
       padding: const EdgeInsets.all(40),
       child: Column(
           mainAxisSize: MainAxisSize.min,
-          children: [
+          ch  ildren: [
             Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
