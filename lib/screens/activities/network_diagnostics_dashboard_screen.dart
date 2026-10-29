@@ -41,8 +41,11 @@ class _NetworkDiagnosticsDashboardScreenState
                 color: colorScheme.primaryContainer,
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: Icon(Icons.speed_rounded,
-                  color: colorScheme.onPrimaryContainer, size: 20),
+              child: Icon(
+                Icons.speed_rounded,
+                color: colorScheme.onPrimaryContainer,
+                size: 20,
+              ),
             ),
             const SizedBox(width: 10),
             const Flexible(
@@ -56,18 +59,22 @@ class _NetworkDiagnosticsDashboardScreenState
         ),
         actions: [
           IconButton(
-            icon: Icon(Icons.running_with_errors_rounded,
-                color: colorScheme.primary),
+            icon: Icon(
+              Icons.running_with_errors_rounded,
+              color: colorScheme.primary,
+            ),
             tooltip: 'Run full diagnostic now',
             onPressed: health.isRunning
                 ? null
                 : () =>
-                    context.read<NetworkHealthProvider>().runDiagnosticsNow(),
+                      context.read<NetworkHealthProvider>().runDiagnosticsNow(),
           ),
           IconButton(
             icon: const Icon(Icons.delete_sweep_rounded),
             tooltip: 'Clear log',
-            onPressed: health.log.isEmpty ? null : () => context.read<NetworkHealthProvider>().clearLog(),
+            onPressed: health.log.isEmpty
+                ? null
+                : () => context.read<NetworkHealthProvider>().clearLog(),
           ),
         ],
       ),
@@ -124,14 +131,17 @@ class _NetworkDiagnosticsDashboardScreenState
             FilledButton.icon(
               onPressed: health.isRunning
                   ? null
-                  : () =>
-                      context.read<NetworkHealthProvider>().runDiagnosticsNow(),
+                  : () => context
+                        .read<NetworkHealthProvider>()
+                        .runDiagnosticsNow(),
               icon: health.isRunning
                   ? const SizedBox(
                       width: 18,
                       height: 18,
                       child: CircularProgressIndicator(
-                          strokeWidth: 2, color: Colors.white),
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
                     )
                   : const Icon(Icons.play_arrow_rounded),
               label: Text(
@@ -139,7 +149,9 @@ class _NetworkDiagnosticsDashboardScreenState
                     ? 'Running ${health.activePhase?.label ?? '…'}…'
                     : 'Run Diagnostics',
                 style: const TextStyle(
-                    fontSize: 16, fontWeight: FontWeight.w600),
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
               style: FilledButton.styleFrom(
                 backgroundColor: const Color(0xFF3B6FE8),
@@ -206,7 +218,10 @@ class _NetworkDiagnosticsDashboardScreenState
             const SizedBox(
               width: 10,
               height: 10,
-              child: CircularProgressIndicator(strokeWidth: 1.5, color: Colors.white),
+              child: CircularProgressIndicator(
+                strokeWidth: 1.5,
+                color: Colors.white,
+              ),
             ),
             const SizedBox(width: 5),
           ],
@@ -227,33 +242,47 @@ class _NetworkDiagnosticsDashboardScreenState
   List<Widget> _idleRows(NetworkTestResults? r, ThemeData theme) {
     final ping = r?.idlePing;
     if (ping == null || !ping.hasData) {
-      return [
-        _mutedRow('No baseline idle ping yet.', theme),
-      ];
+      return [_mutedRow('No baseline idle ping yet.', theme)];
     }
     return [
       _statRow('Average', '${ping.avg} ms', theme),
       _statRow('Minimum', '${ping.min} ms', theme),
       _statRow('Maximum', '${ping.max} ms', theme),
-      _statRow('Packet loss', '${ping.packetLossPercent.toStringAsFixed(1)}%',
-          theme,
-          lossHighlight: true),
+      _statRow(
+        'Packet loss',
+        '${ping.packetLossPercent.toStringAsFixed(1)}%',
+        theme,
+        lossHighlight: true,
+      ),
     ];
   }
 
   List<Widget> _downloadRows(NetworkTestResults? r, ThemeData theme) {
     final d = r?.download;
     if (d == null) {
-      return [_mutedRow('None — run the diagnostic to measure download.', theme)];
+      return [
+        _mutedRow('None — run the diagnostic to measure download.', theme),
+      ];
     }
     return [
-      _statRow('Download speed', '${d.megabitsPerSecond.toStringAsFixed(1)} Mbps',
-          theme, bold: true),
-      _statRow('Data transferred', '${(d.bytesTransferred / (1024 * 1024)).toStringAsFixed(1)} MB', theme),
+      _statRow(
+        'Download speed',
+        '${d.megabitsPerSecond.toStringAsFixed(1)} Mbps',
+        theme,
+        bold: true,
+      ),
+      _statRow(
+        'Data transferred',
+        '${(d.bytesTransferred / (1024 * 1024)).toStringAsFixed(1)} MB',
+        theme,
+      ),
       _statRow('Duration', '${d.durationMs} ms', theme),
       _statRow('Concurrent ping (avg)', '${d.concurrentPing.avg} ms', theme),
-      _statRow('Concurrent packet loss',
-          '${d.concurrentPing.packetLossPercent.toStringAsFixed(1)}%', theme),
+      _statRow(
+        'Concurrent packet loss',
+        '${d.concurrentPing.packetLossPercent.toStringAsFixed(1)}%',
+        theme,
+      ),
     ];
   }
 
@@ -263,32 +292,55 @@ class _NetworkDiagnosticsDashboardScreenState
       return [_mutedRow('None — run the diagnostic to measure upload.', theme)];
     }
     return [
-      _statRow('Upload speed', '${u.megabitsPerSecond.toStringAsFixed(1)} Mbps',
-          theme, bold: true),
-      _statRow('Data transferred', '${(u.bytesTransferred / (1024 * 1024)).toStringAsFixed(1)} MB', theme),
+      _statRow(
+        'Upload speed',
+        '${u.megabitsPerSecond.toStringAsFixed(1)} Mbps',
+        theme,
+        bold: true,
+      ),
+      _statRow(
+        'Data transferred',
+        '${(u.bytesTransferred / (1024 * 1024)).toStringAsFixed(1)} MB',
+        theme,
+      ),
       _statRow('Duration', '${u.durationMs} ms', theme),
       _statRow('Upload ping (avg)', '${u.uploadPing.avg} ms', theme),
-      _statRow('Upload packet loss',
-          '${u.uploadPing.packetLossPercent.toStringAsFixed(1)}%', theme),
+      _statRow(
+        'Upload packet loss',
+        '${u.uploadPing.packetLossPercent.toStringAsFixed(1)}%',
+        theme,
+      ),
     ];
   }
 
-  Widget _statRow(String label, String value, ThemeData theme,
-      {bool bold = false, bool lossHighlight = false}) {
+  Widget _statRow(
+    String label,
+    String value,
+    ThemeData theme, {
+    bool bold = false,
+    bool lossHighlight = false,
+  }) {
     final valueColor = lossHighlight && value.startsWith('100')
         ? const Color(0xFFEF4444)
         : (bold ? const Color(0xFF3B6FE8) : theme.colorScheme.onSurface);
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      child: Wrap(
+        spacing: 16,
+        runSpacing: 4,
+        alignment: WrapAlignment.spaceBetween,
         children: [
-          Text(label, style: theme.textTheme.bodyMedium?.copyWith(fontSize: 13)),
+          Text(
+            label,
+            style: theme.textTheme.bodyMedium?.copyWith(fontSize: 13),
+          ),
           Text(
             value,
             style: theme.textTheme.bodyMedium?.copyWith(
               fontSize: 13,
-              fontWeight: bold || lossHighlight ? FontWeight.bold : FontWeight.w500,
+              fontWeight: bold || lossHighlight
+                  ? FontWeight.bold
+                  : FontWeight.w500,
               color: valueColor,
               fontFeatures: const [FontFeature.tabularFigures()],
             ),
@@ -303,8 +355,9 @@ class _NetworkDiagnosticsDashboardScreenState
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Text(
         text,
-        style: theme.textTheme.bodySmall
-            ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+        style: theme.textTheme.bodySmall?.copyWith(
+          color: theme.colorScheme.onSurfaceVariant,
+        ),
       ),
     );
   }
@@ -325,8 +378,9 @@ class _HealthGaugeCard extends StatelessWidget {
     final tierColor = NetworkHealthTier.fromValue(tier.colorValue);
 
     final cardBg = isDark ? const Color(0xFF1A1F2E) : Colors.white;
-    final textSecondary =
-        isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280);
+    final textSecondary = isDark
+        ? const Color(0xFF9CA3AF)
+        : const Color(0xFF6B7280);
 
     return Container(
       padding: const EdgeInsets.all(20),
@@ -343,95 +397,102 @@ class _HealthGaugeCard extends StatelessWidget {
       ),
       child: Column(
         children: [
-          Row(
-            children: [
-              // Ring gauge
-              _RingGauge(
-                progress: tier.level / 5,
-                color: tierColor,
-                size: 96,
-              ),
-              const SizedBox(width: 18),
-              // Labels
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Connection Health',
-                      style: TextStyle(fontSize: 12, color: textSecondary),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      tier.label,
-                      style: TextStyle(
-                        fontSize: 26,
-                        fontWeight: FontWeight.bold,
-                        color: tierColor,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      tier.description,
-                      style:
-                          TextStyle(fontSize: 12.5, color: textSecondary, height: 1.3),
-                    ),
-                    const SizedBox(height: 8),
-                    if (health.isRunning)
-                      Row(
-                        children: [
-                          const SizedBox(
-                            width: 12,
-                            height: 12,
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          ),
-                          const SizedBox(width: 6),
-                          Text(
-                            'Testing ${health.activePhase?.label ?? '…'}…',
-                            style: TextStyle(
-                                fontSize: 12,
-                                color: const Color(0xFF3B6FE8),
-                                fontWeight: FontWeight.w600),
-                          ),
-                        ],
-                      )
-                    else if (health.latest == null)
-                      Text(
-                        'Press "Run Diagnostics" to begin.',
-                        style: TextStyle(fontSize: 12, color: textSecondary),
-                      )
-                    else
-                      Text(
-                        'Last run ${_timeAgo(health.latest!.startedAt)} · '
-                        'run #${health.runCount}',
-                        style: TextStyle(fontSize: 12, color: textSecondary),
-                      ),
-                  ],
+          LayoutBuilder(
+            builder: (context, constraints) => Flex(
+              direction: constraints.maxWidth < 320
+                  ? Axis.vertical
+                  : Axis.horizontal,
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Ring gauge
+                _RingGauge(
+                  progress: tier.level / 5,
+                  color: tierColor,
+                  size: 96,
                 ),
-              ),
-            ],
+                const SizedBox(width: 18, height: 18),
+                // Labels
+                Flexible(
+                  fit: FlexFit.loose,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Connection Health',
+                        style: TextStyle(fontSize: 12, color: textSecondary),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        tier.label,
+                        style: TextStyle(
+                          fontSize: 26,
+                          fontWeight: FontWeight.bold,
+                          color: tierColor,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        tier.description,
+                        style: TextStyle(
+                          fontSize: 12.5,
+                          color: textSecondary,
+                          height: 1.3,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      if (health.isRunning)
+                        Row(
+                          children: [
+                            const SizedBox(
+                              width: 12,
+                              height: 12,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            ),
+                            const SizedBox(width: 6),
+                            Expanded(
+                              child: Text(
+                                'Testing ${health.activePhase?.label ?? '…'}…',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: const Color(0xFF3B6FE8),
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ],
+                        )
+                      else if (health.latest == null)
+                        Text(
+                          'Press "Run Diagnostics" to begin.',
+                          style: TextStyle(fontSize: 12, color: textSecondary),
+                        )
+                      else
+                        Text(
+                          'Last run ${_timeAgo(health.latest!.startedAt)} · '
+                          'run #${health.runCount}',
+                          style: TextStyle(fontSize: 12, color: textSecondary),
+                        ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
           const SizedBox(height: 16),
           // Tier legend strip
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          Wrap(
+            spacing: 12,
+            runSpacing: 8,
+            alignment: WrapAlignment.spaceBetween,
             children: [
               _LegendDot(
                 color: const Color(0xFF10B981),
                 label: 'Excellent >10',
               ),
-              _LegendDot(
-                color: const Color(0xFFF59E0B),
-                label: 'Fair 2–10',
-              ),
-              _LegendDot(
-                color: const Color(0xFFEF4444),
-                label: 'Poor <2',
-              ),
-              _LegendDot(
-                color: const Color(0xFF8B5CF6),
-                label: 'Degraded',
-              ),
+              _LegendDot(color: const Color(0xFFF59E0B), label: 'Fair 2–10'),
+              _LegendDot(color: const Color(0xFFEF4444), label: 'Poor <2'),
+              _LegendDot(color: const Color(0xFF8B5CF6), label: 'Degraded'),
             ],
           ),
         ],
@@ -460,15 +521,13 @@ class _LegendDot extends StatelessWidget {
         Container(
           width: 8,
           height: 8,
-          decoration:
-              BoxDecoration(color: color, shape: BoxShape.circle),
+          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
         ),
         const SizedBox(width: 4),
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 10.5,
-            color: Colors.grey.shade500,
+        Flexible(
+          child: Text(
+            label,
+            style: TextStyle(fontSize: 10.5, color: Colors.grey.shade500),
           ),
         ),
       ],
@@ -489,25 +548,28 @@ class _RingGauge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return TweenAnimationBuilder<double>(
-      tween: Tween(begin: 0, end: progress.clamp(0.0, 1.0)),
-      duration: const Duration(milliseconds: 800),
-      curve: Curves.easeOutCubic,
-      builder: (context, value, _) {
-        return CustomPaint(
-          size: Size.square(size),
-          painter: _RingPainter(progress: value, color: color),
-          child: Center(
-            child: Text(
-              '${(progress * 100).round()}%',
-              style: const TextStyle(
-                fontSize: 15,
-                fontWeight: FontWeight.bold,
+    return SizedBox.square(
+      dimension: size,
+      child: TweenAnimationBuilder<double>(
+        tween: Tween(begin: 0, end: progress.clamp(0.0, 1.0)),
+        duration: const Duration(milliseconds: 800),
+        curve: Curves.easeOutCubic,
+        builder: (context, value, _) {
+          return CustomPaint(
+            size: Size.square(size),
+            painter: _RingPainter(progress: value, color: color),
+            child: Center(
+              child: Text(
+                '${(progress * 100).round()}%',
+                style: const TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
-          ),
-        );
-      },
+          );
+        },
+      ),
     );
   }
 }
@@ -535,13 +597,7 @@ class _RingPainter extends CustomPainter {
       ..strokeWidth = stroke
       ..strokeCap = StrokeCap.round
       ..color = color;
-    canvas.drawArc(
-      rect,
-      -math.pi / 2,
-      math.pi * 2 * progress,
-      false,
-      sweep,
-    );
+    canvas.drawArc(rect, -math.pi / 2, math.pi * 2 * progress, false, sweep);
   }
 
   @override
@@ -578,10 +634,10 @@ class _PhaseCard extends StatelessWidget {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final cardBg = isDark ? const Color(0xFF1A1F2E) : Colors.white;
-    final textPrimary =
-        isDark ? Colors.white : const Color(0xFF0F172A);
-    final textSecondary =
-        isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280);
+    final textPrimary = isDark ? Colors.white : const Color(0xFF0F172A);
+    final textSecondary = isDark
+        ? const Color(0xFF9CA3AF)
+        : const Color(0xFF6B7280);
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -629,15 +685,14 @@ class _PhaseCard extends StatelessWidget {
                   ],
                 ),
               ),
-              headerTrailing,
             ],
           ),
+          headerTrailing,
           if (status != null) ...[
             const SizedBox(height: 12),
             Container(
               width: double.infinity,
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               decoration: BoxDecoration(
                 color: color.withValues(alpha: 0.08),
                 borderRadius: BorderRadius.circular(10),
@@ -689,8 +744,7 @@ class _ConsolePanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final panelBg =
-        isDark ? const Color(0xFF0D1117) : const Color(0xFFF1F5F9);
+    final panelBg = isDark ? const Color(0xFF0D1117) : const Color(0xFFF1F5F9);
     final count = entries.length;
 
     return Container(
@@ -706,10 +760,16 @@ class _ConsolePanel extends StatelessWidget {
         children: [
           Padding(
             padding: const EdgeInsets.fromLTRB(14, 12, 14, 6),
-            child: Row(
+            child: Wrap(
+              spacing: 6,
+              runSpacing: 6,
+              crossAxisAlignment: WrapCrossAlignment.center,
               children: [
-                Icon(Icons.terminal_rounded,
-                    size: 15, color: colorScheme.onSurfaceVariant),
+                Icon(
+                  Icons.terminal_rounded,
+                  size: 15,
+                  color: colorScheme.onSurfaceVariant,
+                ),
                 const SizedBox(width: 6),
                 Text(
                   'Diagnostic Console',
@@ -719,7 +779,7 @@ class _ConsolePanel extends StatelessWidget {
                     letterSpacing: 0.5,
                   ),
                 ),
-                const Spacer(),
+
                 Text(
                   '$count entries',
                   style: theme.textTheme.labelSmall?.copyWith(
@@ -736,8 +796,9 @@ class _ConsolePanel extends StatelessWidget {
                 child: Text(
                   'No diagnostics run yet.\nTap "Run Diagnostics" to start.',
                   textAlign: TextAlign.center,
-                  style: theme.textTheme.bodySmall
-                      ?.copyWith(color: colorScheme.outlineVariant),
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: colorScheme.outlineVariant,
+                  ),
                 ),
               ),
             )
@@ -763,8 +824,9 @@ class _ConsolePanel extends StatelessWidget {
                           style: TextStyle(
                             fontFamily: 'monospace',
                             fontSize: 10.5,
-                            color: colorScheme.onSurfaceVariant
-                                .withValues(alpha: 0.5),
+                            color: colorScheme.onSurfaceVariant.withValues(
+                              alpha: 0.5,
+                            ),
                           ),
                         ),
                         const SizedBox(width: 10),
