@@ -42,13 +42,12 @@ class _MainShellState extends State<MainShell> {
 
     final navBg = isDark ? const Color(0xFF1A1F2E) : Colors.white;
     final selectedColor = const Color(0xFF3B6FE8);
-    final unselectedColor = isDark ? const Color(0xFF6B7280) : const Color(0xFF9CA3AF);
+    final unselectedColor = isDark
+        ? const Color(0xFF6B7280)
+        : const Color(0xFF9CA3AF);
 
     return Scaffold(
-      body: IndexedStack(
-        index: _currentIndex,
-        children: screens,
-      ),
+      body: IndexedStack(index: _currentIndex, children: screens),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
           color: navBg,
@@ -209,7 +208,9 @@ class HomeTab extends StatelessWidget {
     final bgColor = isDark ? const Color(0xFF0B0F19) : const Color(0xFFF0F4FF);
     final cardBg = isDark ? const Color(0xFF1A1F2E) : Colors.white;
     final textPrimary = isDark ? Colors.white : const Color(0xFF0F172A);
-    final textSecondary = isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280);
+    final textSecondary = isDark
+        ? const Color(0xFF9CA3AF)
+        : const Color(0xFF6B7280);
 
     return Scaffold(
       backgroundColor: bgColor,
@@ -220,39 +221,37 @@ class HomeTab extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Header row
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Flexible(
-                              child: Text(
-                                'Hello, ${appProvider.userName} ',
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                  color: textPrimary,
-                                ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Flexible(
+                            child: Text(
+                              'Hello, ${appProvider.userName} ',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: textPrimary,
                               ),
                             ),
-                            const Text('👋', style: TextStyle(fontSize: 20)),
-                          ],
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          'Welcome back to your lab activities!',
-                          style: TextStyle(fontSize: 13, color: textSecondary),
-                        ),
-                      ],
-                    ),
+                          ),
+                          const Text('👋', style: TextStyle(fontSize: 20)),
+                        ],
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        'Welcome back to your lab activities!',
+                        style: TextStyle(fontSize: 13, color: textSecondary),
+                      ),
+                    ],
                   ),
-                  const SizedBox(width: 12),
+                  const SizedBox(height: 12),
                   Row(
                     children: [
                       // Global network health indicator
@@ -303,26 +302,28 @@ class HomeTab extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'Total Activities',
-                          style: TextStyle(
-                            color: Colors.white70,
-                            fontSize: 13,
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'Total Activities',
+                            style: TextStyle(
+                              color: Colors.white70,
+                              fontSize: 13,
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 6),
-                        Text(
-                          '${activities.length}',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 38,
-                            fontWeight: FontWeight.bold,
+                          const SizedBox(height: 6),
+                          Text(
+                            '${activities.length}',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 38,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                     Icon(
                       Icons.science_rounded,
@@ -345,23 +346,27 @@ class HomeTab extends StatelessWidget {
               ),
               const SizedBox(height: 14),
 
-              // 2x2 grid
-              GridView.count(
-                crossAxisCount: 2,
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                crossAxisSpacing: 14,
-                mainAxisSpacing: 14,
-                childAspectRatio: 1.0,
-                children: activities.map((activity) {
-                  return _ActivityGridCard(
-                    activity: activity,
-                    cardBg: cardBg,
-                    textPrimary: textPrimary,
-                    textSecondary: textSecondary,
-                    onTap: () => openActivity(context, activity),
+              // Keep two columns, but let each card grow with its labels.
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  final cardWidth = (constraints.maxWidth - 14) / 2;
+                  return Wrap(
+                    spacing: 14,
+                    runSpacing: 14,
+                    children: activities.map((activity) {
+                      return SizedBox(
+                        width: cardWidth,
+                        child: _ActivityGridCard(
+                          activity: activity,
+                          cardBg: cardBg,
+                          textPrimary: textPrimary,
+                          textSecondary: textSecondary,
+                          onTap: () => openActivity(context, activity),
+                        ),
+                      );
+                    }).toList(),
                   );
-                }).toList(),
+                },
               ),
               const SizedBox(height: 28),
 
@@ -379,18 +384,21 @@ class HomeTab extends StatelessWidget {
                 icon: Icons.map_outlined,
                 title: 'Bayugan Local Spots',
                 subtitle: 'Custom map and geofence tracker',
-                description: 'Explore verified neighborhood spots and record entry and exit events.',
+                description:
+                    'Explore verified neighborhood spots and record entry and exit events.',
                 gradientColors: const [Color(0xFF2E8B57), Color(0xFF217565)],
-                onTap: () => Navigator.push(context, MaterialPageRoute(
-                  builder: (_) => const LocalSpotsScreen(),
-                )),
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const LocalSpotsScreen()),
+                ),
               ),
               const SizedBox(height: 12),
               _FeatureCard(
                 icon: Icons.speed_rounded,
                 title: 'Network Diagnostics',
                 subtitle: 'Ping · Bandwidth · Health Tier',
-                description: 'Run real-time network tests and monitor your connection quality live.',
+                description:
+                    'Run real-time network tests and monitor your connection quality live.',
                 gradientColors: const [Color(0xFF06B6D4), Color(0xFF0284C7)],
                 onTap: () => Navigator.push(
                   context,
@@ -404,13 +412,12 @@ class HomeTab extends StatelessWidget {
                 icon: Icons.hub_rounded,
                 title: 'Local Mesh Chat',
                 subtitle: 'P2P · No Internet · Android',
-                description: 'Send messages between nearby devices using Bluetooth & Wi-Fi Direct.',
+                description:
+                    'Send messages between nearby devices using Bluetooth & Wi-Fi Direct.',
                 gradientColors: const [Color(0xFF7C3AED), Color(0xFF4F46E5)],
                 onTap: () => Navigator.push(
                   context,
-                  MaterialPageRoute(
-                    builder: (_) => const MeshChatScreen(),
-                  ),
+                  MaterialPageRoute(builder: (_) => const MeshChatScreen()),
                 ),
               ),
             ],
@@ -454,6 +461,7 @@ class _ActivityGridCard extends StatelessWidget {
           ],
         ),
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
@@ -464,13 +472,10 @@ class _ActivityGridCard extends StatelessWidget {
               ),
               child: Icon(activity.icon, color: Colors.white, size: 22),
             ),
-            const Spacer(),
+            const SizedBox(height: 16),
             Text(
               activity.title,
-              style: TextStyle(
-                fontSize: 12,
-                color: textSecondary,
-              ),
+              style: TextStyle(fontSize: 12, color: textSecondary),
             ),
             const SizedBox(height: 2),
             Text(
@@ -480,8 +485,6 @@ class _ActivityGridCard extends StatelessWidget {
                 fontWeight: FontWeight.bold,
                 color: textPrimary,
               ),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
             ),
           ],
         ),
@@ -515,8 +518,9 @@ class _FeatureCard extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final cardBg = isDark ? const Color(0xFF1A1F2E) : Colors.white;
     final textPrimary = isDark ? Colors.white : const Color(0xFF0F172A);
-    final textSecondary =
-        isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280);
+    final textSecondary = isDark
+        ? const Color(0xFF9CA3AF)
+        : const Color(0xFF6B7280);
 
     return GestureDetector(
       onTap: onTap,
@@ -567,7 +571,9 @@ class _FeatureCard extends StatelessWidget {
                   // Pill chip subtitle
                   Container(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 8, vertical: 2),
+                      horizontal: 8,
+                      vertical: 2,
+                    ),
                     decoration: BoxDecoration(
                       color: gradientColors[0].withValues(alpha: 0.14),
                       borderRadius: BorderRadius.circular(8),
@@ -596,8 +602,7 @@ class _FeatureCard extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 8),
-            Icon(Icons.chevron_right_rounded,
-                color: textSecondary, size: 22),
+            Icon(Icons.chevron_right_rounded, color: textSecondary, size: 22),
           ],
         ),
       ),
@@ -620,7 +625,9 @@ class ActivitiesTab extends StatelessWidget {
     final bgColor = isDark ? const Color(0xFF0B0F19) : const Color(0xFFF0F4FF);
     final cardBg = isDark ? const Color(0xFF1A1F2E) : Colors.white;
     final textPrimary = isDark ? Colors.white : const Color(0xFF0F172A);
-    final textSecondary = isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280);
+    final textSecondary = isDark
+        ? const Color(0xFF9CA3AF)
+        : const Color(0xFF6B7280);
 
     return Scaffold(
       backgroundColor: bgColor,
@@ -629,10 +636,7 @@ class ActivitiesTab extends StatelessWidget {
         elevation: 0,
         title: Text(
           'Activities',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: textPrimary,
-          ),
+          style: TextStyle(fontWeight: FontWeight.bold, color: textPrimary),
         ),
         actions: const [SizedBox(width: 8)],
       ),
@@ -642,8 +646,9 @@ class ActivitiesTab extends StatelessWidget {
         separatorBuilder: (_, _) => const SizedBox(height: 14),
         itemBuilder: (context, index) {
           final activity = activities[index];
-          final completedCount =
-              activity.tasks.where((t) => t.isCompleted).length;
+          final completedCount = activity.tasks
+              .where((t) => t.isCompleted)
+              .length;
           return GestureDetector(
             onTap: () => openActivity(context, activity),
             child: Container(
@@ -698,8 +703,11 @@ class ActivitiesTab extends StatelessWidget {
                       ],
                     ),
                   ),
-                  Icon(Icons.chevron_right_rounded,
-                      color: textSecondary, size: 24),
+                  Icon(
+                    Icons.chevron_right_rounded,
+                    color: textSecondary,
+                    size: 24,
+                  ),
                 ],
               ),
             ),
@@ -724,7 +732,9 @@ class SettingsTab extends StatelessWidget {
     final bgColor = isDark ? const Color(0xFF0B0F19) : const Color(0xFFF0F4FF);
     final cardBg = isDark ? const Color(0xFF1A1F2E) : Colors.white;
     final textPrimary = isDark ? Colors.white : const Color(0xFF0F172A);
-    final textSecondary = isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280);
+    final textSecondary = isDark
+        ? const Color(0xFF9CA3AF)
+        : const Color(0xFF6B7280);
     final dividerColor = isDark
         ? Colors.white.withValues(alpha: 0.07)
         : Colors.black.withValues(alpha: 0.06);
@@ -736,10 +746,7 @@ class SettingsTab extends StatelessWidget {
         elevation: 0,
         title: Text(
           'Settings',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: textPrimary,
-          ),
+          style: TextStyle(fontWeight: FontWeight.bold, color: textPrimary),
         ),
       ),
       body: SingleChildScrollView(
@@ -770,9 +777,10 @@ class SettingsTab extends StatelessWidget {
                           ? appProvider.userName[0].toUpperCase()
                           : 'J',
                       style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold),
+                        color: Colors.white,
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                   const SizedBox(width: 14),
@@ -789,10 +797,7 @@ class SettingsTab extends StatelessWidget {
                       ),
                       Text(
                         appProvider.userRole,
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: textSecondary,
-                        ),
+                        style: TextStyle(fontSize: 13, color: textSecondary),
                       ),
                     ],
                   ),
@@ -818,7 +823,9 @@ class SettingsTab extends StatelessWidget {
                 children: [
                   Padding(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 18, vertical: 6),
+                      horizontal: 18,
+                      vertical: 6,
+                    ),
                     child: Row(
                       children: [
                         Text(
@@ -835,7 +842,9 @@ class SettingsTab extends StatelessWidget {
                   Divider(height: 0, color: dividerColor),
                   Padding(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 18, vertical: 14),
+                      horizontal: 18,
+                      vertical: 14,
+                    ),
                     child: Row(
                       children: [
                         Icon(
@@ -1008,8 +1017,7 @@ class _SettingsMenuItem extends StatelessWidget {
           onTap: onTap,
           borderRadius: BorderRadius.circular(18),
           child: Padding(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
             child: Row(
               children: [
                 Icon(icon, color: iconColor ?? textSecondary, size: 22),
@@ -1024,8 +1032,11 @@ class _SettingsMenuItem extends StatelessWidget {
                     ),
                   ),
                 ),
-                Icon(Icons.chevron_right_rounded,
-                    color: textSecondary, size: 20),
+                Icon(
+                  Icons.chevron_right_rounded,
+                  color: textSecondary,
+                  size: 20,
+                ),
               ],
             ),
           ),

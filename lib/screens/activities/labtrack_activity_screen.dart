@@ -9,8 +9,7 @@ class LabTrackActivityScreen extends StatefulWidget {
   const LabTrackActivityScreen({super.key, required this.activity});
 
   @override
-  State<LabTrackActivityScreen> createState() =>
-      _LabTrackActivityScreenState();
+  State<LabTrackActivityScreen> createState() => _LabTrackActivityScreenState();
 }
 
 class _LabTrackActivityScreenState extends State<LabTrackActivityScreen> {
@@ -40,8 +39,9 @@ class _LabTrackActivityScreenState extends State<LabTrackActivityScreen> {
     final bgColor = isDark ? const Color(0xFF0B0F19) : const Color(0xFFF0F4FF);
     final cardBg = isDark ? const Color(0xFF1A1F2E) : Colors.white;
     final textPrimary = isDark ? Colors.white : const Color(0xFF0F172A);
-    final textSecondary =
-        isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280);
+    final textSecondary = isDark
+        ? const Color(0xFF9CA3AF)
+        : const Color(0xFF6B7280);
 
     return Scaffold(
       backgroundColor: bgColor,
@@ -49,8 +49,11 @@ class _LabTrackActivityScreenState extends State<LabTrackActivityScreen> {
         backgroundColor: bgColor,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios_new_rounded,
-              color: textPrimary, size: 20),
+          icon: Icon(
+            Icons.arrow_back_ios_new_rounded,
+            color: textPrimary,
+            size: 20,
+          ),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
@@ -163,27 +166,32 @@ class _LabTrackActivityScreenState extends State<LabTrackActivityScreen> {
                                   color: task.isCompleted
                                       ? activity.themeColor
                                       : (isDark
-                                          ? const Color(0xFF4B5563)
-                                          : const Color(0xFFD1D5DB)),
+                                            ? const Color(0xFF4B5563)
+                                            : const Color(0xFFD1D5DB)),
                                   width: 2,
                                 ),
                               ),
                               child: task.isCompleted
-                                  ? const Icon(Icons.check,
-                                      color: Colors.white, size: 14)
+                                  ? const Icon(
+                                      Icons.check,
+                                      color: Colors.white,
+                                      size: 14,
+                                    )
                                   : null,
                             ),
                             const SizedBox(width: 14),
-                            Text(
-                              '${index + 1}. ${task.title}',
-                              style: TextStyle(
-                                fontSize: 15,
-                                color: task.isCompleted
-                                    ? textSecondary
-                                    : textPrimary,
-                                decoration: task.isCompleted
-                                    ? TextDecoration.lineThrough
-                                    : null,
+                            Expanded(
+                              child: Text(
+                                '${index + 1}. ${task.title}',
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  color: task.isCompleted
+                                      ? textSecondary
+                                      : textPrimary,
+                                  decoration: task.isCompleted
+                                      ? TextDecoration.lineThrough
+                                      : null,
+                                ),
                               ),
                             ),
                           ],
@@ -212,8 +220,7 @@ class _LabTrackActivityScreenState extends State<LabTrackActivityScreen> {
                 onPressed: () {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text(
-                          'Viewing details for ${activity.subtitle}'),
+                      content: Text('Viewing details for ${activity.subtitle}'),
                       behavior: SnackBarBehavior.floating,
                     ),
                   );
