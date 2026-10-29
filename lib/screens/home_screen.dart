@@ -65,29 +65,35 @@ class _MainShellState extends State<MainShell> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                _NavItem(
-                  icon: Icons.home_rounded,
-                  label: 'Home',
-                  isSelected: _currentIndex == 0,
-                  selectedColor: selectedColor,
-                  unselectedColor: unselectedColor,
-                  onTap: () => setState(() => _currentIndex = 0),
+                Expanded(
+                  child: _NavItem(
+                    icon: Icons.home_rounded,
+                    label: 'Home',
+                    isSelected: _currentIndex == 0,
+                    selectedColor: selectedColor,
+                    unselectedColor: unselectedColor,
+                    onTap: () => setState(() => _currentIndex = 0),
+                  ),
                 ),
-                _NavItem(
-                  icon: Icons.grid_view_rounded,
-                  label: 'Activities',
-                  isSelected: _currentIndex == 1,
-                  selectedColor: selectedColor,
-                  unselectedColor: unselectedColor,
-                  onTap: () => setState(() => _currentIndex = 1),
+                Expanded(
+                  child: _NavItem(
+                    icon: Icons.grid_view_rounded,
+                    label: 'Activities',
+                    isSelected: _currentIndex == 1,
+                    selectedColor: selectedColor,
+                    unselectedColor: unselectedColor,
+                    onTap: () => setState(() => _currentIndex = 1),
+                  ),
                 ),
-                _NavItem(
-                  icon: Icons.settings_rounded,
-                  label: 'Settings',
-                  isSelected: _currentIndex == 2,
-                  selectedColor: selectedColor,
-                  unselectedColor: unselectedColor,
-                  onTap: () => setState(() => _currentIndex = 2),
+                Expanded(
+                  child: _NavItem(
+                    icon: Icons.settings_rounded,
+                    label: 'Settings',
+                    isSelected: _currentIndex == 2,
+                    selectedColor: selectedColor,
+                    unselectedColor: unselectedColor,
+                    onTap: () => setState(() => _currentIndex = 2),
+                  ),
                 ),
               ],
             ),
@@ -131,6 +137,7 @@ class _NavItem extends StatelessWidget {
           const SizedBox(height: 4),
           Text(
             label,
+            textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 11,
               fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
@@ -303,38 +310,41 @@ class HomeTab extends StatelessWidget {
                   ),
                   borderRadius: BorderRadius.circular(18),
                 ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            'Total Activities',
-                            style: TextStyle(
-                              color: Colors.white70,
-                              fontSize: 13,
+                child: LayoutBuilder(
+                  builder: (context, constraints) => Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'Total Activities',
+                              style: TextStyle(
+                                color: Colors.white70,
+                                fontSize: 13,
+                              ),
                             ),
-                          ),
-                          const SizedBox(height: 6),
-                          Text(
-                            '${activities.length}',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 38,
-                              fontWeight: FontWeight.bold,
+                            const SizedBox(height: 6),
+                            Text(
+                              '${activities.length}',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 38,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
-                    Icon(
-                      Icons.science_rounded,
-                      color: Colors.white.withValues(alpha: 0.4),
-                      size: 56,
-                    ),
-                  ],
+                      if (constraints.maxWidth >= 220)
+                        Icon(
+                          Icons.science_rounded,
+                          color: Colors.white.withValues(alpha: 0.4),
+                          size: 56,
+                        ),
+                    ],
+                  ),
                 ),
               ),
               const SizedBox(height: 24),
@@ -353,7 +363,9 @@ class HomeTab extends StatelessWidget {
               // Keep two columns, but let each card grow with its labels.
               LayoutBuilder(
                 builder: (context, constraints) {
-                  final cardWidth = (constraints.maxWidth - 14) / 2;
+                  final cardWidth = constraints.maxWidth < 280
+                      ? constraints.maxWidth
+                      : (constraints.maxWidth - 14) / 2;
                   return Wrap(
                     spacing: 14,
                     runSpacing: 14,
@@ -541,73 +553,76 @@ class _FeatureCard extends StatelessWidget {
             ),
           ],
         ),
-        child: Row(
-          children: [
-            // Gradient icon block
-            Container(
-              width: 52,
-              height: 52,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: gradientColors,
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                borderRadius: BorderRadius.circular(14),
-              ),
-              child: Icon(icon, color: Colors.white, size: 26),
-            ),
-            const SizedBox(width: 14),
-            // Text
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.bold,
-                      color: textPrimary,
+        child: LayoutBuilder(
+          builder: (context, constraints) => Row(
+            children: [
+              // Gradient icon block
+              if (constraints.maxWidth >= 220)
+                Container(
+                  width: 52,
+                  height: 52,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: gradientColors,
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
                     ),
+                    borderRadius: BorderRadius.circular(14),
                   ),
-                  const SizedBox(height: 3),
-                  // Pill chip subtitle
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 2,
-                    ),
-                    decoration: BoxDecoration(
-                      color: gradientColors[0].withValues(alpha: 0.14),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Text(
-                      subtitle,
+                  child: Icon(icon, color: Colors.white, size: 26),
+                ),
+              if (constraints.maxWidth >= 220) const SizedBox(width: 14),
+              // Text
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
                       style: TextStyle(
-                        fontSize: 10.5,
-                        fontWeight: FontWeight.w600,
-                        color: gradientColors[0],
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                        color: textPrimary,
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 5),
-                  Text(
-                    description,
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: textSecondary,
-                      height: 1.4,
+                    const SizedBox(height: 3),
+                    // Pill chip subtitle
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 2,
+                      ),
+                      decoration: BoxDecoration(
+                        color: gradientColors[0].withValues(alpha: 0.14),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        subtitle,
+                        style: TextStyle(
+                          fontSize: 10.5,
+                          fontWeight: FontWeight.w600,
+                          color: gradientColors[0],
+                        ),
+                      ),
                     ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
+                    const SizedBox(height: 5),
+                    Text(
+                      description,
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: textSecondary,
+                        height: 1.4,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
               ),
-            ),
-            const SizedBox(width: 8),
-            Icon(Icons.chevron_right_rounded, color: textSecondary, size: 22),
-          ],
+              const SizedBox(width: 8),
+              Icon(Icons.chevron_right_rounded, color: textSecondary, size: 22),
+            ],
+          ),
         ),
       ),
     );
@@ -788,22 +803,24 @@ class SettingsTab extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 14),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        appProvider.userName,
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: textPrimary,
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          appProvider.userName,
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: textPrimary,
+                          ),
                         ),
-                      ),
-                      Text(
-                        appProvider.userRole,
-                        style: TextStyle(fontSize: 13, color: textSecondary),
-                      ),
-                    ],
+                        Text(
+                          appProvider.userRole,
+                          style: TextStyle(fontSize: 13, color: textSecondary),
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),

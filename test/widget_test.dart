@@ -84,6 +84,32 @@ void main() {
     });
   }
 
+  for (final width in [172.0, 240.0, 280.0, 320.0]) {
+    testWidgets('Main tabs fit a ${width}px viewport', (tester) async {
+      tester.view.physicalSize = Size(width, 900);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+      await tester.pumpWidget(
+        MultiProvider(
+          providers: [
+            ChangeNotifierProvider(create: (_) => AppProvider()),
+            ChangeNotifierProvider(
+              create: (_) => NetworkHealthProvider(autoStart: false),
+            ),
+          ],
+          child: const MaterialApp(home: MainShell()),
+        ),
+      );
+      expect(tester.takeException(), isNull);
+      await tester.tap(find.text('Activities').last);
+      await tester.pump();
+      expect(tester.takeException(), isNull);
+      await tester.tap(find.text('Settings').last);
+      await tester.pump();
+      expect(tester.takeException(), isNull);
+    });
+  }
+
   testWidgets('Home header wraps within 132px', (tester) async {
     await tester.pumpWidget(
       MultiProvider(
