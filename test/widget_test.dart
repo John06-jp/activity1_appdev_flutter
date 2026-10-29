@@ -84,6 +84,42 @@ void main() {
     });
   }
 
+  testWidgets('Home header wraps within 132px', (tester) async {
+    await tester.pumpWidget(
+      MultiProvider(
+        providers: [
+          ChangeNotifierProvider(create: (_) => AppProvider()),
+          ChangeNotifierProvider(
+            create: (_) => NetworkHealthProvider(autoStart: false),
+          ),
+        ],
+        child: const MaterialApp(home: HomeTab()),
+      ),
+    );
+    final header = tester.widget<Column>(
+      find
+          .descendant(
+            of: find.byType(SingleChildScrollView).first,
+            matching: find.byType(Column),
+          )
+          .at(1),
+    );
+    await tester.pumpWidget(
+      ChangeNotifierProvider(
+        create: (_) => NetworkHealthProvider(autoStart: false),
+        child: MaterialApp(
+          home: Scaffold(
+            body: Center(child: SizedBox(width: 132, child: header)),
+          ),
+        ),
+      ),
+    );
+    expect(tester.takeException(), isNull);
+    final chip = tester.getRect(find.byIcon(Icons.speed_rounded));
+    final avatar = tester.getRect(find.byType(CircleAvatar));
+    expect(avatar.top, greaterThan(chip.bottom));
+  });
+
   testWidgets('Mesh Chat idle state fits a compact viewport', (
     WidgetTester tester,
   ) async {

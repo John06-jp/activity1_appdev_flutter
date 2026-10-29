@@ -170,12 +170,14 @@ class _NetworkHealthChip extends StatelessWidget {
           children: [
             Icon(Icons.speed_rounded, color: color, size: 15),
             const SizedBox(width: 5),
-            Text(
-              tier.label,
-              style: TextStyle(
-                fontSize: 11.5,
-                fontWeight: FontWeight.bold,
-                color: color,
+            Flexible(
+              child: Text(
+                tier.label,
+                style: TextStyle(
+                  fontSize: 11.5,
+                  fontWeight: FontWeight.bold,
+                  color: color,
+                ),
               ),
             ),
             const SizedBox(width: 4),
@@ -252,7 +254,10 @@ class HomeTab extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 12),
-                  Row(
+                  Wrap(
+                    spacing: 6,
+                    runSpacing: 8,
+                    crossAxisAlignment: WrapCrossAlignment.center,
                     children: [
                       // Global network health indicator
                       _NetworkHealthChip(
@@ -267,7 +272,6 @@ class HomeTab extends StatelessWidget {
                           );
                         },
                       ),
-                      const SizedBox(width: 6),
                       CircleAvatar(
                         radius: 18,
                         backgroundColor: const Color(0xFF3B6FE8),
