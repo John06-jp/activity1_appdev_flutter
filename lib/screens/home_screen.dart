@@ -41,7 +41,7 @@ class _MainShellState extends State<MainShell> {
     ];
 
     final navBg = isDark ? const Color(0xFF1A1F2E) : Colors.white;
-    final selectedColor = const Color(0xFF3B6FE8);
+    final selectedColor = Theme.of(context).colorScheme.primary;
     final unselectedColor = isDark
         ? const Color(0xFF6B7280)
         : const Color(0xFF9CA3AF);
@@ -281,7 +281,7 @@ class HomeTab extends StatelessWidget {
                       ),
                       CircleAvatar(
                         radius: 18,
-                        backgroundColor: const Color(0xFF3B6FE8),
+                        backgroundColor: Theme.of(context).colorScheme.primary,
                         child: Text(
                           appProvider.userName.isNotEmpty
                               ? appProvider.userName[0].toUpperCase()
@@ -303,8 +303,15 @@ class HomeTab extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(18),
                 decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFF3B6FE8), Color(0xFF6B8FF8)],
+                  gradient: LinearGradient(
+                    colors: [
+                      Theme.of(context).colorScheme.primary,
+                      Color.lerp(
+                        Theme.of(context).colorScheme.primary,
+                        Colors.white,
+                        0.2,
+                      )!,
+                    ],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
@@ -790,7 +797,7 @@ class SettingsTab extends StatelessWidget {
                 children: [
                   CircleAvatar(
                     radius: 26,
-                    backgroundColor: const Color(0xFF3B6FE8),
+                    backgroundColor: Theme.of(context).colorScheme.primary,
                     child: Text(
                       appProvider.userName.isNotEmpty
                           ? appProvider.userName[0].toUpperCase()
@@ -888,8 +895,40 @@ class SettingsTab extends StatelessWidget {
                         ),
                         Switch(
                           value: isDark,
-                          activeThumbColor: const Color(0xFF3B6FE8),
+                          activeThumbColor: Theme.of(
+                            context,
+                          ).colorScheme.primary,
                           onChanged: (val) => appProvider.toggleTheme(val),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Divider(height: 0, color: dividerColor),
+                  Padding(
+                    padding: const EdgeInsets.all(18),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Theme color',
+                          style: TextStyle(color: textPrimary),
+                        ),
+                        const SizedBox(height: 12),
+                        Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
+                          children: AppAccentColor.values.map((accent) {
+                            return ChoiceChip(
+                              label: Text(accent.label),
+                              avatar: CircleAvatar(
+                                radius: 8,
+                                backgroundColor: accent.primary,
+                              ),
+                              selected: appProvider.accentColor == accent,
+                              onSelected: (_) =>
+                                  appProvider.setAccentColor(accent),
+                            );
+                          }).toList(),
                         ),
                       ],
                     ),
