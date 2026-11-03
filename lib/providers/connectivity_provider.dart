@@ -8,6 +8,8 @@ enum NetStatus { wifi, cellular, offline }
 class ConnectivityProvider extends ChangeNotifier {
   NetStatus _status = NetStatus.offline;
   NetStatus get status => _status;
+  int _revision = 0;
+  int get revision => _revision;
 
   StreamSubscription<List<ConnectivityResult>>? _sub;
   bool _disposed = false;
@@ -17,13 +19,23 @@ class ConnectivityProvider extends ChangeNotifier {
   }
 
   Future<void> _init() async {
-    final initial = await Connectivity().checkConnectivity();
-    if (_disposed) return;
-    _update(initial);
-    _sub = Connectivity().onConnectivityChanged.listen(_update);
+    _sub = Connectivity().onConnectivityChanged.listen(
+      _update,
+      onError: (Object error) => _update([ConnectivityResult.none]),
+    );
+    final revision = _revision;
+    try {
+      final initial = await Connectivity().checkConnectivity();
+      if (!_disposed && revision == _revision) _update(initial);
+    } catch (_) {
+      if (!_disposed && revision == _revision) {
+        _update([ConnectivityResult.none]);
+      }
+    }
   }
 
   void _update(List<ConnectivityResult> results) {
+    if (_disposed) return;
     final prevStatus = _status;
 
     if (results.contains(ConnectivityResult.wifi)) {
@@ -34,12 +46,9 @@ class ConnectivityProvider extends ChangeNotifier {
       _status = NetStatus.offline;
     }
 
+    if (prevStatus != _status) _revision++;
+    RequestQueueService.instance.updateConnection(_status != NetStatus.offline);
     notifyListeners();
-
-    // Trigger recovery when transitioning from offline → connected
-    if (prevStatus == NetStatus.offline && _status != NetStatus.offline) {
-      RequestQueueService.instance.retryQueued();
-    }
   }
 
   @override

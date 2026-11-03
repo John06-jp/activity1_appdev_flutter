@@ -2,23 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/app_provider.dart';
 import '../widgets/connection_status_chip.dart';
+import '../widgets/dashboard_feature_card.dart';
 import '../providers/network_health_provider.dart';
 import '../services/network_diagnostics_service.dart';
-import '../models/activity_model.dart';
-import 'activities/labtrack_activity_screen.dart';
+import 'activities/multi_screen_navigation_screen.dart';
+import 'activities/network_monitor_screen.dart';
 import 'activities/network_diagnostics_dashboard_screen.dart';
 import 'mesh_chat_screen.dart';
 import 'activities/local_spots_screen.dart';
-
-/// Route an activity card to its dedicated lab-activity detail screen.
-void openActivity(BuildContext context, ActivityItem activity) {
-  Navigator.push(
-    context,
-    MaterialPageRoute(
-      builder: (_) => LabTrackActivityScreen(activity: activity),
-    ),
-  );
-}
 
 class MainShell extends StatefulWidget {
   const MainShell({super.key});
@@ -211,12 +202,10 @@ class HomeTab extends StatelessWidget {
   Widget build(BuildContext context) {
     final appProvider = context.watch<AppProvider>();
     final isDark = appProvider.isDarkMode;
-    final activities = ActivityData.activities;
     // App-wide network health broadcast from NetworkHealthProvider.
     final health = context.watch<NetworkHealthProvider>();
 
     final bgColor = isDark ? const Color(0xFF0B0F19) : const Color(0xFFF0F4FF);
-    final cardBg = isDark ? const Color(0xFF1A1F2E) : Colors.white;
     final textPrimary = isDark ? Colors.white : const Color(0xFF0F172A);
     final textSecondary = isDark
         ? const Color(0xFF9CA3AF)
@@ -336,7 +325,7 @@ class HomeTab extends StatelessWidget {
                             ),
                             const SizedBox(height: 6),
                             Text(
-                              '${activities.length}',
+                              '5',
                               style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 38,
@@ -358,43 +347,6 @@ class HomeTab extends StatelessWidget {
               ),
               const SizedBox(height: 24),
 
-              // Activities label
-              Text(
-                'Activities',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: textPrimary,
-                ),
-              ),
-              const SizedBox(height: 14),
-
-              // Keep two columns, but let each card grow with its labels.
-              LayoutBuilder(
-                builder: (context, constraints) {
-                  final cardWidth = constraints.maxWidth < 280
-                      ? constraints.maxWidth
-                      : (constraints.maxWidth - 14) / 2;
-                  return Wrap(
-                    spacing: 14,
-                    runSpacing: 14,
-                    children: activities.map((activity) {
-                      return SizedBox(
-                        width: cardWidth,
-                        child: _ActivityGridCard(
-                          activity: activity,
-                          cardBg: cardBg,
-                          textPrimary: textPrimary,
-                          textSecondary: textSecondary,
-                          onTap: () => openActivity(context, activity),
-                        ),
-                      );
-                    }).toList(),
-                  );
-                },
-              ),
-              const SizedBox(height: 28),
-
               // ── Features section ───────────────────────────────────────
               Text(
                 'Features',
@@ -405,231 +357,11 @@ class HomeTab extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 14),
-              _FeatureCard(
-                icon: Icons.map_outlined,
-                title: 'Bayugan Local Spots',
-                subtitle: 'Custom map and geofence tracker',
-                description:
-                    'Explore verified neighborhood spots and record entry and exit events.',
-                gradientColors: const [Color(0xFF2E8B57), Color(0xFF217565)],
-                onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const LocalSpotsScreen()),
-                ),
-              ),
+              const ActivityOneFeatureCard(),
               const SizedBox(height: 12),
-              _FeatureCard(
-                icon: Icons.speed_rounded,
-                title: 'Network Diagnostics',
-                subtitle: 'Ping · Bandwidth · Health Tier',
-                description:
-                    'Run real-time network tests and monitor your connection quality live.',
-                gradientColors: const [Color(0xFF06B6D4), Color(0xFF0284C7)],
-                onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => const NetworkDiagnosticsDashboardScreen(),
-                  ),
-                ),
-              ),
+              const ActivityTwoFeatureCard(),
               const SizedBox(height: 12),
-              _FeatureCard(
-                icon: Icons.hub_rounded,
-                title: 'Local Mesh Chat',
-                subtitle: 'P2P · No Internet · Android',
-                description:
-                    'Send messages between nearby devices using Bluetooth & Wi-Fi Direct.',
-                gradientColors: const [Color(0xFF7C3AED), Color(0xFF4F46E5)],
-                onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const MeshChatScreen()),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _ActivityGridCard extends StatelessWidget {
-  final ActivityItem activity;
-  final Color cardBg;
-  final Color textPrimary;
-  final Color textSecondary;
-  final VoidCallback onTap;
-
-  const _ActivityGridCard({
-    required this.activity,
-    required this.cardBg,
-    required this.textPrimary,
-    required this.textSecondary,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: cardBg,
-          borderRadius: BorderRadius.circular(18),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.06),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: activity.themeColor,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Icon(activity.icon, color: Colors.white, size: 22),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              activity.title,
-              style: TextStyle(fontSize: 12, color: textSecondary),
-            ),
-            const SizedBox(height: 2),
-            Text(
-              activity.subtitle,
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.bold,
-                color: textPrimary,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-// ─────────────────────────────────────────────
-// FEATURE CARD (wide banner, not an activity)
-// ─────────────────────────────────────────────
-class _FeatureCard extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final String subtitle;
-  final String description;
-  final List<Color> gradientColors;
-  final VoidCallback onTap;
-
-  const _FeatureCard({
-    required this.icon,
-    required this.title,
-    required this.subtitle,
-    required this.description,
-    required this.gradientColors,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final cardBg = isDark ? const Color(0xFF1A1F2E) : Colors.white;
-    final textPrimary = isDark ? Colors.white : const Color(0xFF0F172A);
-    final textSecondary = isDark
-        ? const Color(0xFF9CA3AF)
-        : const Color(0xFF6B7280);
-
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: cardBg,
-          borderRadius: BorderRadius.circular(18),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.07),
-              blurRadius: 10,
-              offset: const Offset(0, 3),
-            ),
-          ],
-        ),
-        child: LayoutBuilder(
-          builder: (context, constraints) => Row(
-            children: [
-              // Gradient icon block
-              if (constraints.maxWidth >= 220)
-                Container(
-                  width: 52,
-                  height: 52,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: gradientColors,
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                  child: Icon(icon, color: Colors.white, size: 26),
-                ),
-              if (constraints.maxWidth >= 220) const SizedBox(width: 14),
-              // Text
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.bold,
-                        color: textPrimary,
-                      ),
-                    ),
-                    const SizedBox(height: 3),
-                    // Pill chip subtitle
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 2,
-                      ),
-                      decoration: BoxDecoration(
-                        color: gradientColors[0].withValues(alpha: 0.14),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Text(
-                        subtitle,
-                        style: TextStyle(
-                          fontSize: 10.5,
-                          fontWeight: FontWeight.w600,
-                          color: gradientColors[0],
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 5),
-                    Text(
-                      description,
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: textSecondary,
-                        height: 1.4,
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 8),
-              Icon(Icons.chevron_right_rounded, color: textSecondary, size: 22),
+              const _CompiledActivityCards(),
             ],
           ),
         ),
@@ -641,114 +373,78 @@ class _FeatureCard extends StatelessWidget {
 // ─────────────────────────────────────────────
 // ACTIVITIES TAB
 // ─────────────────────────────────────────────
+class _CompiledActivityCards extends StatelessWidget {
+  const _CompiledActivityCards();
+
+  @override
+  Widget build(BuildContext context) => Column(
+    children: [
+      DashboardFeatureCard(
+        icon: Icons.speed_rounded,
+        title: 'Network Diagnostics',
+        subtitle: 'Activity 3',
+        description:
+            'Run real-time network tests and monitor your connection quality live.',
+        gradientColors: const [Color(0xFF06B6D4), Color(0xFF0284C7)],
+        onTap: () => Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => const NetworkDiagnosticsDashboardScreen(),
+          ),
+        ),
+      ),
+      const SizedBox(height: 12),
+      DashboardFeatureCard(
+        icon: Icons.hub_rounded,
+        title: 'Local Mesh Chat',
+        subtitle: 'Activity 4',
+        description:
+            'Send messages between nearby devices using Bluetooth & Wi-Fi Direct.',
+        gradientColors: const [Color(0xFF7C3AED), Color(0xFF4F46E5)],
+        onTap: () => Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const MeshChatScreen()),
+        ),
+      ),
+      const SizedBox(height: 12),
+      DashboardFeatureCard(
+        icon: Icons.map_outlined,
+        title: 'Bayugan Local Spots',
+        subtitle: 'Activity 5',
+        description:
+            'Explore verified neighborhood spots and record entry and exit events.',
+        gradientColors: const [Color(0xFF2E8B57), Color(0xFF217565)],
+        onTap: () => Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const LocalSpotsScreen()),
+        ),
+      ),
+      const SizedBox(height: 12),
+    ],
+  );
+}
+
 class ActivitiesTab extends StatelessWidget {
   const ActivitiesTab({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final appProvider = context.watch<AppProvider>();
-    final isDark = appProvider.isDarkMode;
-    final activities = ActivityData.activities;
-
-    final bgColor = isDark ? const Color(0xFF0B0F19) : const Color(0xFFF0F4FF);
-    final cardBg = isDark ? const Color(0xFF1A1F2E) : Colors.white;
-    final textPrimary = isDark ? Colors.white : const Color(0xFF0F172A);
-    final textSecondary = isDark
-        ? const Color(0xFF9CA3AF)
-        : const Color(0xFF6B7280);
-
-    return Scaffold(
-      backgroundColor: bgColor,
-      appBar: AppBar(
-        backgroundColor: bgColor,
-        elevation: 0,
-        title: Text(
-          'Activities',
-          style: TextStyle(fontWeight: FontWeight.bold, color: textPrimary),
-        ),
-        actions: const [SizedBox(width: 8)],
+  Widget build(BuildContext context) => Scaffold(
+    appBar: AppBar(title: const Text('Activities')),
+    body: const SingleChildScrollView(
+      padding: EdgeInsets.all(20),
+      child: Column(
+        children: [
+          ActivityOneFeatureCard(),
+          SizedBox(height: 12),
+          ActivityTwoFeatureCard(),
+          SizedBox(height: 12),
+          _CompiledActivityCards(),
+        ],
       ),
-      body: ListView.separated(
-        padding: const EdgeInsets.all(20),
-        itemCount: activities.length,
-        separatorBuilder: (_, _) => const SizedBox(height: 14),
-        itemBuilder: (context, index) {
-          final activity = activities[index];
-          final completedCount = activity.tasks
-              .where((t) => t.isCompleted)
-              .length;
-          return GestureDetector(
-            onTap: () => openActivity(context, activity),
-            child: Container(
-              padding: const EdgeInsets.all(18),
-              decoration: BoxDecoration(
-                color: cardBg,
-                borderRadius: BorderRadius.circular(18),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.06),
-                    blurRadius: 8,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: activity.themeColor,
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    child: Icon(activity.icon, color: Colors.white, size: 24),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          activity.title,
-                          style: TextStyle(fontSize: 12, color: textSecondary),
-                        ),
-                        Text(
-                          activity.subtitle,
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: textPrimary,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          '$completedCount/${activity.tasks.length} tasks done',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: activity.themeColor,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Icon(
-                    Icons.chevron_right_rounded,
-                    color: textSecondary,
-                    size: 24,
-                  ),
-                ],
-              ),
-            ),
-          );
-        },
-      ),
-    );
-  }
+    ),
+  );
 }
 
-// ─────────────────────────────────────────────
-// SETTINGS TAB
-// ─────────────────────────────────────────────
 class SettingsTab extends StatelessWidget {
   const SettingsTab({super.key});
 
