@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_activity1_appdev/providers/connectivity_provider.dart';
 import 'package:flutter_activity1_appdev/providers/network_health_provider.dart';
 import 'package:flutter_activity1_appdev/services/network_diagnostics_service.dart';
 import 'package:flutter_activity1_appdev/screens/activities/network_diagnostics_dashboard_screen.dart';
@@ -56,8 +57,15 @@ void main() {
           tester.view.devicePixelRatio = 1;
           addTearDown(tester.view.reset);
           await tester.pumpWidget(
-            ChangeNotifierProvider<NetworkHealthProvider>(
-              create: (_) => _SnapshotHealth(running),
+            MultiProvider(
+              providers: [
+                ChangeNotifierProvider(
+                  create: (_) => ConnectivityProvider(autoStart: false),
+                ),
+                ChangeNotifierProvider<NetworkHealthProvider>(
+                  create: (_) => _SnapshotHealth(running),
+                ),
+              ],
               child: MaterialApp(
                 builder: (context, child) => MediaQuery(
                   data: MediaQuery.of(

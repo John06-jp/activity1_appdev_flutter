@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../providers/network_health_provider.dart';
+import '../../widgets/connection_status_chip.dart';
 import '../../services/network_diagnostics_service.dart';
 
 /// ─────────────────────────────────────────────────────────────────────────────
@@ -82,6 +83,11 @@ class _NetworkDiagnosticsDashboardScreenState
         child: ListView(
           padding: const EdgeInsets.all(16),
           children: [
+            const Align(
+              alignment: Alignment.centerLeft,
+              child: ConnectionStatusChip(),
+            ),
+            const SizedBox(height: 14),
             // ── Overall health gauge card ─────────────────────────────────
             _HealthGaugeCard(health: health, isDark: isDark),
 

@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 
 import 'package:flutter_activity1_appdev/models/activity_model.dart';
 import 'package:flutter_activity1_appdev/providers/app_provider.dart';
+import 'package:flutter_activity1_appdev/providers/connectivity_provider.dart';
 import 'package:flutter_activity1_appdev/screens/activities/labtrack_activity_screen.dart';
 import 'package:flutter_activity1_appdev/providers/mesh_provider.dart';
 import 'package:flutter_activity1_appdev/providers/network_health_provider.dart';
@@ -34,6 +35,9 @@ void main() {
         providers: [
           ChangeNotifierProvider.value(value: app),
           ChangeNotifierProvider(
+            create: (_) => ConnectivityProvider(autoStart: false),
+          ),
+          ChangeNotifierProvider(
             create: (_) => NetworkHealthProvider(autoStart: false),
           ),
         ],
@@ -56,6 +60,9 @@ void main() {
       Widget host(Widget screen) => MultiProvider(
         providers: [
           ChangeNotifierProvider(create: (_) => AppProvider()),
+          ChangeNotifierProvider(
+            create: (_) => ConnectivityProvider(autoStart: false),
+          ),
           ChangeNotifierProvider(
             create: (_) => NetworkHealthProvider(autoStart: false),
           ),
@@ -94,6 +101,9 @@ void main() {
           providers: [
             ChangeNotifierProvider(create: (_) => AppProvider()),
             ChangeNotifierProvider(
+              create: (_) => ConnectivityProvider(autoStart: false),
+            ),
+            ChangeNotifierProvider(
               create: (_) => NetworkHealthProvider(autoStart: false),
             ),
           ],
@@ -116,6 +126,9 @@ void main() {
         providers: [
           ChangeNotifierProvider(create: (_) => AppProvider()),
           ChangeNotifierProvider(
+            create: (_) => ConnectivityProvider(autoStart: false),
+          ),
+          ChangeNotifierProvider(
             create: (_) => NetworkHealthProvider(autoStart: false),
           ),
         ],
@@ -131,8 +144,15 @@ void main() {
           .at(1),
     );
     await tester.pumpWidget(
-      ChangeNotifierProvider(
-        create: (_) => NetworkHealthProvider(autoStart: false),
+      MultiProvider(
+        providers: [
+          ChangeNotifierProvider(
+            create: (_) => NetworkHealthProvider(autoStart: false),
+          ),
+          ChangeNotifierProvider(
+            create: (_) => ConnectivityProvider(autoStart: false),
+          ),
+        ],
         child: MaterialApp(
           home: Scaffold(
             body: Center(child: SizedBox(width: 132, child: header)),
@@ -176,8 +196,15 @@ void main() {
     addTearDown(tester.view.reset);
 
     await tester.pumpWidget(
-      ChangeNotifierProvider(
-        create: (_) => NetworkHealthProvider(autoStart: false),
+      MultiProvider(
+        providers: [
+          ChangeNotifierProvider(
+            create: (_) => NetworkHealthProvider(autoStart: false),
+          ),
+          ChangeNotifierProvider(
+            create: (_) => ConnectivityProvider(autoStart: false),
+          ),
+        ],
         child: const MaterialApp(home: NetworkDiagnosticsDashboardScreen()),
       ),
     );

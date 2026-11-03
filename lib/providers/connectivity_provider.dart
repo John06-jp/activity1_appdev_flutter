@@ -9,14 +9,16 @@ class ConnectivityProvider extends ChangeNotifier {
   NetStatus _status = NetStatus.offline;
   NetStatus get status => _status;
 
-  late StreamSubscription<List<ConnectivityResult>> _sub;
+  StreamSubscription<List<ConnectivityResult>>? _sub;
+  bool _disposed = false;
 
-  ConnectivityProvider() {
-    _init();
+  ConnectivityProvider({bool autoStart = true}) {
+    if (autoStart) _init();
   }
 
   Future<void> _init() async {
     final initial = await Connectivity().checkConnectivity();
+    if (_disposed) return;
     _update(initial);
     _sub = Connectivity().onConnectivityChanged.listen(_update);
   }
@@ -42,7 +44,8 @@ class ConnectivityProvider extends ChangeNotifier {
 
   @override
   void dispose() {
-    _sub.cancel();
+    _disposed = true;
+    _sub?.cancel();
     super.dispose();
   }
 }

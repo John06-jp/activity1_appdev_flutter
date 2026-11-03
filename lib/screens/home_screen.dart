@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/app_provider.dart';
+import '../widgets/connection_status_chip.dart';
 import '../providers/network_health_provider.dart';
 import '../services/network_diagnostics_service.dart';
 import '../models/activity_model.dart';
@@ -266,6 +267,7 @@ class HomeTab extends StatelessWidget {
                     runSpacing: 8,
                     crossAxisAlignment: WrapCrossAlignment.center,
                     children: [
+                      const ConnectionStatusChip(),
                       // Global network health indicator
                       _NetworkHealthChip(
                         tier: health.tier,
